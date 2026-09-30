@@ -1,0 +1,25 @@
+# .gitignore
+
+# dependencies (Playwright is installed globally, but just in case)
+node_modules/
+
+# screenshots written by the test suites
+test/shots/
+
+# logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editors and tools
+.vscode/
+.idea/
+.claude/
+
+# working notes
+PLAN.md
+QUESTIONS.md

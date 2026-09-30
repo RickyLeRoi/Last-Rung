@@ -1,0 +1,14 @@
+{
+  "name": "last-rung",
+  "version": "1.0.0",
+  "description": "Helicopter rescue game, white-on-black pixel art. Vanilla HTML5 Canvas.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test/run.js"
+  },
+  "devDependencies": {
+    "terser": "^5.51.2"
+  }
+}
