@@ -97,6 +97,10 @@ test/
   run.js          suite di test (regole, fisica, replay, gamepad...)
   e2e/            collaudo in Chromium vero, una suite per file (keyboard, touch, gamepad, pwa, devpage, layout, touchui, flow, visual) più lib.js e run.js
   levels.js       ogni livello è risolvibile: il pilota automatico salva ogni persona, una alla volta
+  autopilot.js    il pilota automatico, condiviso da levels.js e dai golden
+  golden.js       snapshot di stato, frame e Rng; le baseline stanno in golden/ (Node e browser)
+  scenarios.js    gli scenari condivisi tra golden Node e golden nel browser
+  guards.js       controlli statici sui sorgenti (Math.random, console.log, script in index.html)
 ```
 
 ## Requisiti
@@ -109,9 +113,10 @@ test/
 ```sh
 npm install                                     # una volta sola (terser)
 node build.js                                   # genera dist/last-rung.html e dist/web/, minificati
-node test/run.js                                # suite di test, 40 test (filtro opzionale: node test/run.js replay)
+node test/run.js                                # suite di test, 41 test, guardie statiche comprese (filtro opzionale: node test/run.js replay)
+node test/golden.js                             # snapshot di stato, frame e Rng su 15 scenari (--update solo dopo una modifica voluta)
 node test/levels.js                             # livelli 1-16 e 20 sfide del giorno risolvibili (~2 minuti)
-NODE_PATH=$(npm root -g) node test/e2e/run.js   # collaudo nel browser (serve Playwright; filtro: node test/e2e/run.js touch)
+NODE_PATH=$(npm root -g) node test/e2e/run.js   # collaudo nel browser (serve Playwright; filtro: node test/e2e/run.js touch; ~90 s)
 ```
 
 Su PowerShell l'ultimo comando diventa `$env:NODE_PATH = (npm root -g); node test/e2e/run.js`. Gli screenshot dei test finiscono in `test/shots/`, cartella ignorata da git.

@@ -841,6 +841,12 @@ test('build: HTML, CSS e JS minificati (niente commenti, indentazione né marcat
   return (page.length / 1024).toFixed(1) + ' KB';
 });
 
+test('guardie statiche: Math.random, console.log e script elencati in index.html', () => {
+  const { problems, filesScanned } = require('./guards').runGuards();
+  assert(!problems.length, problems.length + ' violazioni:\n       ' + problems.slice(0, 6).join('\n       '));
+  return filesScanned + ' file';
+});
+
 (async () => {
   const filter = process.argv[2];
   let pass = 0, fail = 0;
