@@ -75,13 +75,16 @@ engine/           parti generiche, riusabili da altri giochi (in costruzione, ve
   gfx/sprite.js   creazione e contorno degli sprite
   gfx/gfx.js      canvas, primitive a pixel interi, font bitmap
   audio/synth.js  sintesi WebAudio generica (effetti e loop forniti dal gioco)
+  gfx/lighting.js buio e nebbia per colonna; gfx/ui.js helper di HUD
+  input/input.js  tastiera, gamepad, touch; core/{replay,loop,steps,flow}.js
+  README.md       contratto gioco <-> engine
   tools/png.js    encoder PNG in scala di grigi (build e test)
 src/
   config.js       tutti i numeri del gioco (fisica, regole, carburante, punteggi)
   sprites.js      pixel art e hitbox
   state.js        stato della partita
   sfx.js          effetti e loop sonori del gioco
-  input.js        tastiera, gamepad, touch
+  bindings.js     tasti, pulsanti del pad e assi del gioco (configura l'Input dell'engine)
   water.js        onde e molle dell'acqua
   particles.js    particelle e detriti fisici
   level.js        generazione dei livelli e sfida del giorno

@@ -5,6 +5,7 @@
  * Static guards on the sources (no game is run):
  *   - Math.random only where it cannot feed the simulation (rendering and audio)
  *   - no console.log in the game
+ *   - engine/ never mentions the game (game., heli, SPRITES, Sfx, the debug global) and reads only the CONFIG keys of the contract
  *   - every source file is listed in the build:js block of its index.html, and every listed file exists
  * Run by test/run.js (so CI executes it) or on its own: node test/guards.js
  */
@@ -12,6 +13,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
+const ENGINE_FORBIDDEN = [[/\bgame\s*\./, 'game.'], [/\bheli\b/, 'heli'], [/\bSPRITES\b/, 'SPRITES'], [/\bSfx\b/, 'Sfx'], [/\b__eli\b/, '__eli']];
+const ENGINE_CONFIG_KEYS = ['W', 'H', 'input', 'maxParticles', 'touchGutter'];
 const MATH_RANDOM_ALLOWED = ['src/render.js', 'engine/audio/synth.js'];
 
 // Pages and the folders whose .js files must be listed in their build:js block. Extended as engine/ and games/ appear.
@@ -61,8 +64,24 @@ function stripComments(source) {
   return output;
 }
 
+function scanEngineCoupling(file, source, problems) {
+  source.split('\n').forEach((line, i) => {
+    for (const [pattern, name] of ENGINE_FORBIDDEN) if (pattern.test(line)) problems.push(file + ':' + (i + 1) + ': engine accoppiato al gioco (' + name + ')');
+    for (const match of line.matchAll(/\bCONFIG\s*\.\s*(\w+)/g)) {
+      if (!ENGINE_CONFIG_KEYS.includes(match[1])) problems.push(file + ':' + (i + 1) + ": CONFIG." + match[1] + " non e' nel contratto (ammesse: " + ENGINE_CONFIG_KEYS.join(', ') + ')');
+    }
+  });
+  for (const match of source.matchAll(/\{([^{}]*)\}\s*=\s*CONFIG\b/g)) {
+    for (const key of match[1].split(',').map(part => part.split(':')[0].trim()).filter(Boolean)) {
+      if (!ENGINE_CONFIG_KEYS.includes(key)) problems.push(file + ': CONFIG.' + key + " (destrutturato) non e' nel contratto");
+    }
+  }
+}
+
 function scanForbiddenCalls(file, problems) {
-  const lines = stripComments(fs.readFileSync(path.join(ROOT, file), 'utf8')).split('\n');
+  const source = stripComments(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+  if (file.startsWith('engine/')) scanEngineCoupling(file, source, problems);
+  const lines = source.split('\n');
   lines.forEach((line, i) => {
     if (/\bMath\s*\.\s*random\b/.test(line) && !MATH_RANDOM_ALLOWED.includes(file)) problems.push(file + ':' + (i + 1) + ': Math.random fuori da ' + MATH_RANDOM_ALLOWED.join(', ') + ' (la simulazione usa Rng)');
     if (/\bconsole\s*\.\s*log\b/.test(line)) problems.push(file + ':' + (i + 1) + ': console.log nel gioco');

@@ -77,5 +77,6 @@ const CONFIG = (() => {
     timers: { float: [3000, 4200], fire: [3600, 4800], fallFloat: 3000, fallFire: 2400, perLoop: 0.85 },
     input: { deadzone: 0.18, stickRadius: 46 },
     maxParticles: 1200,
+    touchGutter: 84,   // px reserved on each side of the canvas for the touch buttons
   };
 })();

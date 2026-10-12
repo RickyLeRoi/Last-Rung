@@ -35,7 +35,7 @@ module.exports = async (browser, ctx) => {
   gameState = await state(page);
   const isActive = await page.evaluate(() => document.getElementById('bStab').classList.contains('act'));
   check(gameState.stab && isActive, 'telefono: pulsante STAB attiva lo stabilizzatore e si evidenzia');
-  const winchDownBox = await (await page.$('[data-winch="1"]')).boundingBox();
+  const winchDownBox = await (await page.$('[data-hold="winch:1"]')).boundingBox();
   await touch('touchStart', winchDownBox.x + winchDownBox.width / 2, winchDownBox.y + winchDownBox.height / 2);
   await page.waitForTimeout(600);
   await touch('touchEnd');

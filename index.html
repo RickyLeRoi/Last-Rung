@@ -58,7 +58,7 @@
     <button data-edge="skip" class="tut">SALTA</button>
   </div>
   <div class="btns br">
-    <div class="row play"><button data-winch="-1" title="Riavvolgi la scaletta">▲</button><button data-winch="1" title="Allunga la scaletta">▼</button></div>
+    <div class="row play"><button data-hold="winch:-1" title="Riavvolgi la scaletta">▲</button><button data-hold="winch:1" title="Allunga la scaletta">▼</button></div>
     <button data-edge="drop" class="play">SGANCIA</button>
     <button data-edge="stab" class="play" id="bStab">STAB</button>
   </div>
@@ -76,14 +76,21 @@
 <!-- build:js (build.js replaces this block with one inline script) -->
 <script src="src/config.js"></script>
 <script src="engine/core/util.js"></script>
+<script src="engine/core/strings.js"></script>
 <script src="engine/core/geometry.js"></script>
+<script src="engine/core/replay.js"></script>
+<script src="engine/core/loop.js"></script>
 <script src="engine/gfx/sprite.js"></script>
 <script src="src/sprites.js"></script>
 <script src="engine/gfx/gfx.js"></script>
+<script src="engine/gfx/lighting.js"></script>
+<script src="engine/gfx/ui.js"></script>
+<script src="engine/core/steps.js"></script>
 <script src="src/state.js"></script>
 <script src="engine/audio/synth.js"></script>
 <script src="src/sfx.js"></script>
-<script src="src/input.js"></script>
+<script src="engine/input/input.js"></script>
+<script src="src/bindings.js"></script>
 <script src="engine/world/water.js"></script>
 <script src="src/water.js"></script>
 <script src="engine/world/particles.js"></script>
@@ -102,6 +109,7 @@
 <script src="engine/world/camera.js"></script>
 <script src="src/env.js"></script>
 <script src="src/render.js"></script>
+<script src="engine/core/flow.js"></script>
 <script src="src/main.js"></script>
 <!-- /build:js -->
 </body>

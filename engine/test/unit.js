@@ -69,6 +69,57 @@ test('geometry: bresenham visita gli estremi e withBounds calcola il riquadro', 
   assertEqual([bounded.x0, bounded.x1, bounded.y0, bounded.y1], [2, 6, 7, 9], 'riquadro');
 });
 
+test('Replay.codec: codifica e decodifica identiche', () => {
+  const { Replay } = loadScripts(['engine/core/util.js', 'engine/core/replay.js'], ['Replay']);
+  const codec = Replay.codec({ axes: ['hx', 'winch'], flags: ['stab', 'drop', 'buoy'] });
+  const frame = codec.encode({ hx: -0.25, winch: 1, stab: true, drop: false, buoy: true });
+  assertEqual(frame, [-25, 100, 5], 'frame');
+  assertEqual(codec.decode(frame), { hx: -0.25, winch: 1, stab: true, drop: false, buoy: true }, 'decode');
+});
+
+test('Camera: segue il bersaglio restando nel mondo, il tremolio decade e si azzera', () => {
+  const { Camera } = loadScripts(['engine/core/util.js', 'engine/world/camera.js'], ['Camera']);
+  assertEqual(Camera.follow(0, -50, 1000, 384, 0.5), 0, 'limite sinistro');
+  assertEqual(Camera.follow(0, 5000, 1000, 384, 1), 616, 'limite destro');
+  assertEqual(Camera.follow(100, 200, 1000, 384, 0.1), 110, 'interpolazione');
+  assertEqual(Camera.decayShake(10), 8.8, 'decadimento');
+  assertEqual(Camera.decayShake(0.3), 0, 'sotto soglia');
+});
+
+test('Weather: vento nullo senza base, deterministico con base; pioggia con Rng seedato', () => {
+  const { Weather, Rng } = loadScripts(['engine/core/util.js', 'engine/world/weather.js'], ['Weather', 'Rng']);
+  assertEqual(Weather.wind(0, 12), 0, 'senza vento');
+  assertEqual(Weather.wind(2, 3.5), Weather.wind(2, 3.5), 'stesso tempo, stesso vento');
+  Rng.seed(5);
+  const first = Weather.initRain(4, 384, 216);
+  Rng.seed(5);
+  assertEqual(Weather.initRain(4, 384, 216), first, 'stessa sequenza dal seed');
+  assertEqual(first.length, 4, 'numero di gocce');
+});
+
+test('Steps: avanza piu passi nello stesso frame e sceglie il testo per dispositivo', () => {
+  const { Steps } = loadScripts(['engine/core/steps.js'], ['Steps'], { UI: { hint: (keyboard, touch) => keyboard + '/' + touch } });
+  const state = { step: 0 };
+  let advanced = 0;
+  const steps = [{ done: () => true }, { done: () => true }, { done: () => false }];
+  Steps.update(state, steps, () => advanced++);
+  assertEqual([state.step, advanced], [2, 2], 'passi completati');
+  assertEqual(Steps.text({ text: 'FISSO' }), 'FISSO');
+  assertEqual(Steps.text({ kb: 'A', touch: 'B' }), 'A/B');
+});
+
+test('Water: superficie infinita fuori dall acqua, spinta e propagazione delle molle', () => {
+  const { Water } = loadScripts(['engine/core/util.js', 'engine/world/water.js'], ['Water']);
+  assertEqual(Water.surfaceY(null, 10, 0), Infinity, 'senza acqua');
+  const water = Water.make(100, [0, 0, 0], [1, 1, 1], [[0, 50]], 300);
+  assertEqual(Water.surfaceY(water, 80, 0), Infinity, 'fuori dai range');
+  assertEqual(Water.surfaceY(water, 20, 0), 100, 'acqua ferma');
+  Water.push(water, 30, 1, 2);
+  assert(water.v[10] === 1 && Math.abs(water.v[9] - 2 / 3) < 1e-6, 'spinta centrata con attenuazione');
+  for (let i = 0; i < 5; i++) Water.update(water);
+  assert(water.h[12] !== 0, 'la perturbazione si propaga ai vicini');
+});
+
 function loadGfx() {
   const dom = fakeDom();
   const { Gfx } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js'], ['Gfx'], { document: dom.document, window: dom.window, CONFIG: { W: 384, H: 216 } });

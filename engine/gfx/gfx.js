@@ -8,7 +8,8 @@ const Gfx = (() => {
 
   function fit() {
     const touchControls = document.getElementById('touch');
-    const gutter = touchControls && touchControls.classList && touchControls.classList.contains('on') ? 2 * 84 : 0;
+    const touchGutter = CONFIG.touchGutter === undefined ? 84 : CONFIG.touchGutter;
+    const gutter = touchControls && touchControls.classList && touchControls.classList.contains('on') ? 2 * touchGutter : 0;
     const fitScale = Math.min((window.innerWidth - gutter) / SCREEN_WIDTH, window.innerHeight / SCREEN_HEIGHT);
     const integerScale = Math.floor(fitScale);
     // integer scale when it wastes little space (pixel-perfect), fractional otherwise (phones)
@@ -121,13 +122,13 @@ const Gfx = (() => {
     blackRect(x, y, width, height); outlineRect(x, y, width, height); outlineRect(x + 2, y + 2, width - 4, height - 4);
   }
   // skew tilts the legs only (swinging hanging people)
-  function drawSprite(sprite, x, y, flip, skew) {
+  function drawSprite(sprite, x, y, flip, skew, skewFromRow = 4) {
     x = round(x); y = round(y);
     const pixels = sprite.p;
     for (let i = 0; i < pixels.length; i += 2) {
       const sourceX = pixels[i], sourceY = pixels[i + 1];
       let offsetX = flip ? sprite.w - 1 - sourceX : sourceX;
-      if (skew && sourceY >= 4) offsetX += round(skew * (sourceY - 3) / 4);
+      if (skew && sourceY >= skewFromRow) offsetX += round(skew * (sourceY - (skewFromRow - 1)) / 4);
       canvasContext.fillRect(x + offsetX, y + sourceY, 1, 1);
     }
   }

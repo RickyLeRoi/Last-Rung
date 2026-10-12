@@ -18,10 +18,8 @@ const TUTORIAL = [
   { text: "TIRALO FUORI DALL'ACQUA E PORTALO IN SALVO", done: () => tutorialGone('alley') },
 ];
 
-const tutorialText = step => step.text || hint(step.kb, step.touch, step.pad);
+const tutorialText = Steps.text;
 
 function updateTutorial() {
-  const tutorialState = game.tut;
-  if (!tutorialState) return;
-  while (tutorialState.step < TUTORIAL.length && TUTORIAL[tutorialState.step].done()) { tutorialState.step++; Sfx.play('ui'); }
+  if (game.tut) Steps.update(game.tut, TUTORIAL, () => Sfx.play('ui'));
 }

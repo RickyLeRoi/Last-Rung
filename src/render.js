@@ -2,16 +2,7 @@
 // Drawing only: Math.random is allowed here because it never feeds the simulation.
 const { canvasContext, SCREEN_WIDTH, SCREEN_HEIGHT, DITHER, DARK, DUSK, RED, horizontalLine, verticalLine, outlineRect, blackRect, drawLine, drawCircle, text, textBox, drawPanel, drawSprite, drawSpriteScaled } = Gfx;
 
-// Blood pixels are painted last so the lightning inversion does not turn them blue.
-const redPixels = [];
-function drawRed() {
-  if (!redPixels.length) return;
-  canvasContext.fillStyle = RED;
-  for (let i = 0; i < redPixels.length; i += 2) canvasContext.fillRect(redPixels[i], redPixels[i + 1], 1, 1);
-  canvasContext.fillStyle = '#fff';
-}
-
-const hint = (keyboard, touch, gamepad) => (Input.device === 'touch' ? touch : Input.device === 'pad' ? gamepad : keyboard);
+const hint = UI.hint;
 
 function moonPixels(level) {
   const key = level.night && !level.moonFull ? 'falce' : 'piena';
@@ -253,12 +244,12 @@ function drawHeli() {
       const spriteColumn = heli.blood[i], localY = heli.blood[i + 1];
       if (localY >= 12) {
         const rung = localY - 12;
-        if (rung < ladderLength) redPixels.push(x + spriteColumn + swingOffset(rung), ladderTop + rung);
+        if (rung < ladderLength) UI.red.add(x + spriteColumn + swingOffset(rung), ladderTop + rung);
         continue;
       }
       const column = flipped ? 31 - spriteColumn : spriteColumn;
       if (localY === 0 && Math.abs(column - rotorCenter) > rotorHalfLength) continue;
-      redPixels.push(x + column, y + localY + tiltOffset(column));
+      UI.red.add(x + column, y + localY + tiltOffset(column));
     }
   }
   for (let i = heli.att.length - 1; i >= 0; i--) drawHanging(heli.att[i]);
@@ -272,7 +263,7 @@ function drawHeli() {
 function drawParticle(particle) {
   switch (particle.t) {
     case 'px':
-      if (particle.bl) redPixels.push(round(particle.x), round(particle.y)); else canvasContext.fillRect(round(particle.x), round(particle.y), 1, 1);
+      if (particle.bl) UI.red.add(round(particle.x), round(particle.y)); else canvasContext.fillRect(round(particle.x), round(particle.y), 1, 1);
       break;
     case 'chunk': {
       if (particle.life < 60 && (game.frame >> 2) & 1) break;
@@ -321,7 +312,7 @@ function drawWorld(cameraX) {
     drawSolid(solid, cameraX);
     if (solid.blood && solid.blood.length) {
       const solidX = round(solid.x), solidY = round(solid.y);
-      for (let i = 0; i < solid.blood.length; i += 2) redPixels.push(solidX + solid.blood[i], solidY + solid.blood[i + 1]);
+      for (let i = 0; i < solid.blood.length; i += 2) UI.red.add(solidX + solid.blood[i], solidY + solid.blood[i + 1]);
     }
   }
   for (const hazard of level.haz) {
@@ -365,7 +356,7 @@ function drawNight(offsetX, offsetY) {
     circles.push(heli.x + 16 - offsetX, heli.y + 8 + offsetY, nightConfig.halo);
     if (heli.state === 'fly' && !heli.engineOff) {
       const angle = clamp(heli.vx * 0.35 + heli.face * 0.22, -0.8, 0.8);
-      cones.push({ x: heli.x + 16 - offsetX, y: heli.y + 13 + offsetY, a: angle, dx: Math.sin(angle), dy: Math.cos(angle), c: Math.cos(nightConfig.cone), len: nightConfig.coneLen });
+      cones.push({ x: heli.x + 16 - offsetX, y: heli.y + 13 + offsetY, angle, halfAngle: nightConfig.cone, length: nightConfig.coneLen });
     }
   }
   const safeZone = level.safe;
@@ -376,44 +367,7 @@ function drawNight(offsetX, offsetY) {
     else if (particle.t === 'chunk' && particle.fire) circles.push(particle.x - offsetX, particle.y + offsetY, 6);
   }
   if (game.boltT > 0 && game.bolt) for (const segment of game.bolt.segs) circles.push(segment[2] - offsetX, segment[3] + offsetY, 14);
-  const litSpans = [];
-  canvasContext.fillStyle = level.moonFull ? DUSK : DARK;
-  for (let column = 0; column < SCREEN_WIDTH; column++) {
-    litSpans.length = 0;
-    const columnCenterX = column + 0.5;
-    for (let i = 0; i < circles.length; i += 3) {
-      const deltaX = columnCenterX - circles[i], radius = circles[i + 2];
-      if (deltaX > -radius && deltaX < radius) { const halfChord = Math.sqrt(radius * radius - deltaX * deltaX); litSpans.push(circles[i + 1] - halfChord, circles[i + 1] + halfChord); }
-    }
-    for (const cone of cones) {
-      const coneDeltaX = columnCenterX - cone.x;
-      if (coneDeltaX < -cone.len || coneDeltaX > cone.len) continue;
-      let litTop = 1e9, litBottom = -1e9;
-      const scanStart = Math.max(0, Math.floor(cone.y - cone.len)), scanEnd = Math.min(SCREEN_HEIGHT, Math.ceil(cone.y + cone.len));
-      for (let y = scanStart; y < scanEnd; y++) {
-        const coneDeltaY = y + 0.5 - cone.y, distance = Math.sqrt(coneDeltaX * coneDeltaX + coneDeltaY * coneDeltaY);
-        if (distance <= cone.len && coneDeltaX * cone.dx + coneDeltaY * cone.dy >= cone.c * distance) { if (y < litTop) litTop = y; litBottom = y + 1; }
-      }
-      if (litBottom > litTop) litSpans.push(litTop, litBottom);
-    }
-    const order = [];
-    for (let i = 0; i < litSpans.length; i += 2) order.push(i);
-    order.sort((first, second) => litSpans[first] - litSpans[second]);
-    let darkFromY = 0;
-    for (const i of order) {
-      const spanTop = Math.max(0, Math.floor(litSpans[i])), spanBottom = Math.min(SCREEN_HEIGHT, Math.ceil(litSpans[i + 1]));
-      if (spanTop > darkFromY) canvasContext.fillRect(column, darkFromY, 1, spanTop - darkFromY);
-      if (spanBottom > darkFromY) darkFromY = spanBottom;
-    }
-    if (darkFromY < SCREEN_HEIGHT) canvasContext.fillRect(column, darkFromY, 1, SCREEN_HEIGHT - darkFromY);
-  }
-  canvasContext.fillStyle = '#fff';
-  for (const cone of cones) {
-    for (const sign of [-1, 1]) {
-      const edgeAngle = cone.a + sign * nightConfig.cone;
-      drawLine(cone.x, cone.y, cone.x + Math.sin(edgeAngle) * cone.len * 0.8, cone.y + Math.cos(edgeAngle) * cone.len * 0.8, true);
-    }
-  }
+  Lighting.darkness({ circles, cones, pattern: level.moonFull ? DUSK : DARK });
 }
 
 function drawNightSky(cameraX) {
@@ -446,29 +400,7 @@ function drawFog(offsetX, offsetY) {
   const heliX = heli.x + 16 - offsetX, heliY = heli.y + 8 + offsetY;
   const clear = [heliX, heliY, fogConfig.clear], lights = [];
   for (const fire of level.fires) lights.push(fire.x + fire.w / 2 - offsetX, fire.y - fire.h / 2 + offsetY, fogConfig.fire + fire.w / 2);
-  const circleSpan = (circle, column) => { const deltaX = column + 0.5 - circle[0]; if (deltaX <= -circle[2] || deltaX >= circle[2]) return null; const halfChord = Math.sqrt(circle[2] * circle[2] - deltaX * deltaX); return [circle[1] - halfChord, circle[1] + halfChord]; };
-  for (let column = 0; column < SCREEN_WIDTH; column++) {
-    const litSpans = [];
-    const clearSpan = circleSpan(clear, column); if (clearSpan) litSpans.push(clearSpan);
-    for (let i = 0; i < lights.length; i += 3) { const lightSpan = circleSpan([lights[i], lights[i + 1], lights[i + 2]], column); if (lightSpan) litSpans.push(lightSpan); }
-    const thin = circleSpan([heliX, heliY, fogConfig.thin], column);
-    let y = 0;
-    litSpans.sort((first, second) => first[0] - second[0]);
-    const fill = (fromY, toY) => {
-      if (toY <= fromY) return;
-      if (!thin) { canvasContext.fillStyle = DARK; canvasContext.fillRect(column, fromY, 1, toY - fromY); return; }
-      const thinTop = Math.max(0, Math.floor(thin[0])), thinBottom = Math.min(SCREEN_HEIGHT, Math.ceil(thin[1]));
-      const segment = (segTop, segBottom, pattern) => { segTop = Math.max(segTop, fromY); segBottom = Math.min(segBottom, toY); if (segBottom > segTop) { canvasContext.fillStyle = pattern; canvasContext.fillRect(column, segTop, 1, segBottom - segTop); } };
-      segment(0, thinTop, DARK); segment(thinTop, thinBottom, DITHER); segment(thinBottom, SCREEN_HEIGHT, DARK);
-    };
-    for (const litSpan of litSpans) {
-      const litTop = Math.max(0, Math.floor(litSpan[0])), litBottom = Math.min(SCREEN_HEIGHT, Math.ceil(litSpan[1]));
-      fill(y, litTop);
-      if (litBottom > y) y = litBottom;
-    }
-    fill(y, SCREEN_HEIGHT);
-  }
-  canvasContext.fillStyle = '#fff';
+  Lighting.fog({ clear, lights, thin: [heliX, heliY, fogConfig.thin], dark: DARK, dither: DITHER });
   const time = game.time;
   for (let i = 0; i < 9; i++) {
     const bankY = 22 + i * 19 + round(Math.sin(time * 0.4 + i) * 3);
@@ -492,10 +424,7 @@ function drawBeacons() {
   }
 }
 
-function bar(x, y, width, fraction) {
-  outlineRect(x, y, width, 7);
-  canvasContext.fillRect(x + 1, y + 1, round((width - 2) * clamp(fraction, 0, 1)), 5);
-}
+const bar = UI.bar;
 
 function drawHUD() {
   const level = game.L, heli = game.heli, frame = game.frame;
@@ -572,9 +501,7 @@ function drawHUD() {
   if (game.state === 'replay' && (frame >> 4) & 1) textBox('REPLAY  -  ' + hint('INVIO', 'TOCCA', 'A') + ' PER SALTARE', SCREEN_WIDTH / 2, 32, 'c');
 }
 
-function drawStars(starCount, y) {
-  for (let i = 0; i < 3; i++) drawSpriteScaled(i < starCount ? SPRITES.starOn : SPRITES.starOff, SCREEN_WIDTH / 2 - 31 + i * 22, y, 2);
-}
+const drawStars = (starCount, y) => UI.stars({ on: SPRITES.starOn, off: SPRITES.starOff }, starCount, y);
 
 function drawOverlay() {
   const level = game.L, blink = (game.frame >> 5) & 1, state = game.state;
@@ -610,12 +537,12 @@ function drawOverlay() {
     text(level.sc.name, SCREEN_WIDTH / 2, 68, 2, 'c');
     text(level.tutorial ? hint("N: SALTA L'ADDESTRAMENTO", "SALTA: ESCI DALL'ADDESTRAMENTO", "Y: SALTA L'ADDESTRAMENTO") : level.sc.hint, SCREEN_WIDTH / 2, 88, 1, 'c');
     text('DA SALVARE: ' + level.total + "  (SERVE PIU' DELLA META')", SCREEN_WIDTH / 2, 99, 1, 'c');
-    notes.forEach((line, i) => text(line, SCREEN_WIDTH / 2, 112 + i * 9, 1, 'c'));
+    UI.lines(notes, SCREEN_WIDTH / 2, 112, 9);
     if (blink) text(hint('INVIO PER INIZIARE', 'TOCCA PER INIZIARE', 'A PER INIZIARE'), SCREEN_WIDTH / 2, promptY, 1, 'c');
   } else if (state === 'pause') {
     drawPanel(SCREEN_WIDTH / 2 - 60, SCREEN_HEIGHT / 2 - 18, 120, 36);
-    text('PAUSA', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 10, 2, 'c');
-    text(hint('P PER RIPRENDERE', 'TOCCA PER RIPRENDERE', 'START PER RIPRENDERE'), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 6, 1, 'c');
+    text(STRINGS.pause, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 10, 2, 'c');
+    text(hint(STRINGS.resumeKeyboard, STRINGS.resumeTouch, STRINGS.resumePad), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 6, 1, 'c');
   } else if (state === 'over' && game.overT <= 0) {
     drawPanel(38, 58, SCREEN_WIDTH - 76, 90);
     text('GAME OVER', SCREEN_WIDTH / 2, 68, 3, 'c');
@@ -636,12 +563,12 @@ function drawOverlay() {
     if (blink) text(hint('INVIO: ' + next + '   V: REPLAY', 'TOCCA: ' + next, 'A: ' + next + '   Y: REPLAY'), SCREEN_WIDTH / 2, 148, 1, 'c');
   }
   if (Input.device === 'touch' && window.innerHeight > window.innerWidth && (game.frame >> 5) & 1) {
-    textBox('RUOTA IL TELEFONO IN ORIZZONTALE', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30, 'c');
+    textBox(STRINGS.rotatePhone, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30, 'c');
   }
 }
 
 function render() {
-  redPixels.length = 0;
+  UI.red.clear();
   canvasContext.setTransform(1, 0, 0, 1, 0, 0);
   canvasContext.globalCompositeOperation = 'source-over';
   canvasContext.fillStyle = '#000'; canvasContext.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); canvasContext.fillStyle = '#fff';
@@ -651,7 +578,7 @@ function render() {
   const cameraX = round(game.camX);
   canvasContext.setTransform(1, 0, 0, 1, -cameraX + shakeX, shakeY);
   drawWorld(cameraX);
-  drawRed();
+  UI.red.flush();
   canvasContext.setTransform(1, 0, 0, 1, 0, 0);
   for (const drop of game.rain) drawLine(drop.x, drop.y, drop.x - game.wind * 1.5 - 0.5, drop.y - 3);
   const fullFlash = game.flashT > 0 && !game.softFlash;
@@ -668,11 +595,9 @@ function render() {
     canvasContext.setTransform(1, 0, 0, 1, 0, 0);
   }
   if (fullFlash) {
-    canvasContext.globalCompositeOperation = 'difference';
-    canvasContext.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    canvasContext.globalCompositeOperation = 'source-over';
+    UI.invert();
     canvasContext.setTransform(1, 0, 0, 1, -cameraX + shakeX, shakeY);
-    drawRed();
+    UI.red.flush();
     canvasContext.setTransform(1, 0, 0, 1, 0, 0);
   }
   if (game.state !== 'title') drawHUD();
