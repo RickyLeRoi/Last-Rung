@@ -68,6 +68,37 @@ const advance = (page, frames) => page.evaluate(count => window.__clock.advance(
 // Runs frames until the page-side predicate source (a function expression string) is true; returns frames spent or -1.
 const advanceUntil = (page, predicateSource, maxFrames) => page.evaluate(({ source, max }) => window.__clock.until(eval(source), max), { source: predicateSource, max: maxFrames });
 
+// Same mulberry32 as the Node harness. WebAudio is removed too: its setup also draws from Math.random and would shift the sequence.
+const seededRandomScript = seed => {
+  let state = seed | 0;
+  Math.random = () => {
+    state = (state + 0x6D2B79F5) | 0;
+    let mixed = Math.imul(state ^ (state >>> 15), 1 | state);
+    mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed;
+    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
+  };
+  window.AudioContext = undefined;
+  window.webkitAudioContext = undefined;
+};
+const installSeededRandom = (page, seed) => page.addInitScript(seededRandomScript, seed);
+
+// The canvas as one byte per pixel with the Node harness mapping (#fff -> 255, blood red -> 128, #000 -> 0, base64).
+// Any other colour is counted in `bad`.
+const readGrayFrame = page => page.evaluate(() => {
+  const canvas = document.getElementById('game'), pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+  const gray = new Uint8Array(canvas.width * canvas.height);
+  let bad = 0;
+  for (let i = 0, pixelIndex = 0; i < pixels.length; i += 4, pixelIndex++) {
+    const red = pixels[i], green = pixels[i + 1], blue = pixels[i + 2];
+    if (red === 255 && green === 255 && blue === 255) gray[pixelIndex] = 255;
+    else if (red === 221 && green === 0 && blue === 0) gray[pixelIndex] = 128;
+    else if (red !== 0 || green !== 0 || blue !== 0) bad++;
+  }
+  let binary = '';
+  for (let i = 0; i < gray.length; i += 8192) binary += String.fromCharCode.apply(null, gray.subarray(i, i + 8192));
+  return { bad, base64: btoa(binary) };
+});
+
 const collectErrors = page => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -107,4 +138,4 @@ async function staticServer(webDirectory) {
   return { baseUrl: 'http://localhost:' + server.address().port + '/', close: () => server.close() };
 }
 
-module.exports = { DEV_HTML, DEV_URL, DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, waitForState, installManualClock, advance, advanceUntil, collectErrors, openWithClock, enterPlay, hold, staticServer };
+module.exports = { DEV_HTML, DEV_URL, DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, waitForState, installManualClock, advance, advanceUntil, installSeededRandom, readGrayFrame, collectErrors, openWithClock, enterPlay, hold, staticServer };

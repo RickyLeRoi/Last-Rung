@@ -1,0 +1,105 @@
+{
+ "game": "last-rung",
+ "scenarios": {
+  "G01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "frame": "71a11fd6ff7995c442ae158ea6f7af5dfb9ba4d4"
+    }
+   ]
+  },
+  "G03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "478efead87120085089552cf8941ee9a5771827c"
+    },
+    {
+     "at": 600,
+     "frame": "b2248f520ec67b6546a611c0d5cf0ef15d584b65"
+    },
+    {
+     "at": 900,
+     "frame": "5cea71e42f961f670868062313ba14d8dda27021"
+    },
+    {
+     "at": 1200,
+     "frame": "12083d7254382875bb4bc8fd9d53b6870cb55c19"
+    },
+    {
+     "at": 1500,
+     "frame": "78c69d288f69fdf414667e2f0060e4d0360e847e"
+    },
+    {
+     "at": 1800,
+     "frame": "2bef29c2598535fe1eefaf974e1aa079e1769c09"
+    },
+    {
+     "at": 2100,
+     "frame": "daa791b659db1e479b0a03bdc244b1cc200835e7"
+    },
+    {
+     "at": 2400,
+     "frame": "6546e3b3b05e0e41ade5500e3879eda480194024"
+    }
+   ]
+  },
+  "G07": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "66fd3fd9b9380b6d107fd9709eac19d0fc5d5970"
+    },
+    {
+     "at": 600,
+     "frame": "a27ca5aed8543de5b2d67503a42042dae2eb5aaa"
+    },
+    {
+     "at": 900,
+     "frame": "e38c035b9cd5e44612301b9272a1f46089ec639b"
+    },
+    {
+     "at": 1200,
+     "frame": "e627637c3dafcc88063bd01055b3d3053fd3baf7"
+    },
+    {
+     "at": 1500,
+     "frame": "bed0c8698d6c2d9ba92fd333a95178fe13d16574"
+    },
+    {
+     "at": 1800,
+     "frame": "4727c71db81250fb9ada73aefa456b7a1044b80d"
+    }
+   ]
+  },
+  "G08": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "7a46af12b3b53021bdce61f78853c970718654a7"
+    },
+    {
+     "at": 600,
+     "frame": "a7c298e04e36271a40844f000196032c9d95416f"
+    },
+    {
+     "at": 900,
+     "frame": "c83a34971668fdb801d689b1512451f20d1fc50e"
+    },
+    {
+     "at": 1200,
+     "frame": "2bf24996ce0b767f25966504159b16db8f6cbc97"
+    },
+    {
+     "at": 1500,
+     "frame": "c73fc0d683c44b81b920fddaca1413ecdd85819f"
+    },
+    {
+     "at": 1800,
+     "frame": "f53cf6a4b0e9394d191436fca5e29a83fa5b1c35"
+    }
+   ]
+  }
+ }
+}

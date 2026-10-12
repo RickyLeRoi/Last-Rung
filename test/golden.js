@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const { boot, randomKeysPolicy, place, roofWithoutObstacles } = require('./harness');
 const { rescueOne } = require('./autopilot');
+const { SEA_ACTIONS: SEA_ACTION_DATA, SHARED_SCENARIOS } = require('./scenarios');
 
 const BASELINE_FILE = path.join(__dirname, 'golden', 'last-rung.json');
 const CHECKPOINT_EVERY = 300;
@@ -42,7 +43,9 @@ const randomInput = (policySeed, actions = {}) => {
 const playLevel = levelNumber => driver => driver.play(driver.hook.levelSpec(levelNumber));
 const nothing = () => {};
 
-const SEA_ACTIONS = { 300: tapKey('KeyX'), 400: downKey('KeyE'), 470: upKey('KeyE'), 650: tapKey('KeyZ') };
+const decodeActions = data => Object.fromEntries(Object.entries(data).map(([frame, [kind, code]]) => [frame, kind === 'tap' ? tapKey(code) : kind === 'down' ? downKey(code) : upKey(code)]));
+const SEA_ACTIONS = decodeActions(SEA_ACTION_DATA);
+const sharedScenario = ({ id, seed, level, frames, policySeed, actions }) => ({ id, seed, run: framed({ start: level ? playLevel(level) : nothing, frames, input: policySeed === null ? nothing : randomInput(policySeed, decodeActions(actions)) }) });
 
 // [from, to, keys]: the arrow keys held from frame `from` up to (excluding) `to`.
 const TUTORIAL_FLIGHT = [[0, 60, ['ArrowUp']], [61, 180, ['ArrowRight']], [181, 240, ['ArrowDown']], [241, 330, ['ArrowLeft']], [331, 400, ['ArrowUp']],
@@ -58,7 +61,7 @@ const markEveryoneSaved = driver => {
 const stormRun = framed({ start: playLevel(2), frames: 2400, input: randomInput(22, SEA_ACTIONS) });
 
 const SCENARIOS = [
-  { id: 'G01', seed: 1001, run: framed({ start: nothing, frames: 240, input: nothing }) },
+  sharedScenario(SHARED_SCENARIOS.G01),
   { id: 'G02', seed: 1002, run: framed({
     start: driver => { driver.tap('Enter'); driver.tick(2); driver.tap('Enter'); },
     frames: 1500,
@@ -67,12 +70,12 @@ const SCENARIOS = [
       driver.set(segment ? segment[2] : []);
       if (TUTORIAL_ACTIONS[i]) TUTORIAL_ACTIONS[i](driver);
     } }) },
-  { id: 'G03', seed: 1003, run: framed({ start: playLevel(1), frames: 2400, input: randomInput(11, SEA_ACTIONS) }) },
+  sharedScenario(SHARED_SCENARIOS.G03),
   { id: 'G04', seed: 1004, run: stormRun },
   { id: 'G05', seed: 1005, run: framed({ start: playLevel(3), frames: 2400, input: randomInput(33, { 1500: tapKey('Space') }) }) },
   { id: 'G06', seed: 1006, run: framed({ start: playLevel(4), frames: 2400, input: randomInput(44, { 600: tapKey('KeyC'), 900: tapKey('KeyC') }) }) },
-  { id: 'G07', seed: 1007, run: framed({ start: playLevel(5), frames: 1800, input: randomInput(55) }) },
-  { id: 'G08', seed: 1008, run: framed({ start: playLevel(10), frames: 1800, input: randomInput(100) }) },
+  sharedScenario(SHARED_SCENARIOS.G07),
+  sharedScenario(SHARED_SCENARIOS.G08),
   { id: 'G09', seed: 1009, run: framed({ start: playLevel(13), frames: 1800, input: randomInput(130) }) },
   { id: 'G10', seed: 1010, run: framed({ start: driver => driver.play(driver.hook.dailySpec('2026-10-12')), frames: 1800, input: randomInput(7) }) },
   { id: 'G11', seed: 1011, run: (driver, record) => {
