@@ -9,7 +9,7 @@ const path = require('path');
 const { chromium } = require('playwright');
 const { DIST_HTML, WEB_DIR, summary } = require('./lib');
 
-const SUITES = ['keyboard', 'touch', 'gamepad', 'pwa'];
+const SUITES = ['keyboard', 'touch', 'gamepad', 'pwa', 'devpage', 'layout', 'touchui', 'flow', 'visual'];
 const requested = process.argv.slice(2);
 const unknown = requested.filter(name => !SUITES.includes(name));
 if (unknown.length) { console.error('suite sconosciuta: ' + unknown.join(', ') + ' (disponibili: ' + SUITES.join(', ') + ')'); process.exit(2); }

@@ -5,9 +5,11 @@ const http = require('http');
 const fs = require('fs');
 
 const ROOT = path.join(__dirname, '..', '..');
+const DEV_HTML = path.join(ROOT, 'index.html');
 const DIST_HTML = path.join(ROOT, 'dist', 'last-rung.html');
 const WEB_DIR = path.join(ROOT, 'dist', 'web');
 const GAME_URL = 'file://' + DIST_HTML + '?debug';
+const DEV_URL = 'file://' + DEV_HTML + '?debug';
 const SHOTS = path.join(ROOT, 'test', 'shots');
 
 let fails = 0;
@@ -39,6 +41,59 @@ async function startPlay(page) {
 
 const state = page => page.evaluate(() => { const game = window.__eli.game, heli = game.heli; return { st: game.state, x: heli.x, y: heli.y, vx: heli.vx, vy: heli.vy, stab: heli.stab, hs: heli.state }; });
 
+const waitForState = (page, name, timeout = 3000) => page.waitForFunction(expected => window.__eli.game.state === expected, name, { timeout });
+
+// Replaces performance.now and requestAnimationFrame so tests decide exactly how many 60 Hz steps run.
+// Must be installed with page.addInitScript before the game loads.
+const manualClockScript = () => {
+  const stepMs = 1000 / 60 + 1e-7;
+  let now = 0, pending = [];
+  performance.now = () => now;
+  window.requestAnimationFrame = callback => pending.push(callback);
+  const advance = frames => {
+    for (let i = 0; i < frames; i++) {
+      now += stepMs;
+      const due = pending; pending = [];
+      for (const callback of due) callback(now);
+    }
+  };
+  const until = (predicate, maxFrames) => {
+    for (let i = 0; i < maxFrames; i++) { if (predicate()) return i; advance(1); }
+    return predicate() ? maxFrames : -1;
+  };
+  window.__clock = { advance, until };
+};
+const installManualClock = page => page.addInitScript(manualClockScript);
+const advance = (page, frames) => page.evaluate(count => window.__clock.advance(count), frames);
+// Runs frames until the page-side predicate source (a function expression string) is true; returns frames spent or -1.
+const advanceUntil = (page, predicateSource, maxFrames) => page.evaluate(({ source, max }) => window.__clock.until(eval(source), max), { source: predicateSource, max: maxFrames });
+
+const collectErrors = page => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  return errors;
+};
+// Opens the bundle under the manual clock, already past the first two frames.
+async function openWithClock(browser, query = '', viewport = { width: 1280, height: 720 }) {
+  const page = await browser.newPage({ viewport });
+  const errors = collectErrors(page);
+  await installManualClock(page);
+  await page.goto(GAME_URL + query);
+  await advance(page, 2);
+  return { page, errors };
+}
+// title -> intro -> play with two confirmations, one frame step between them (two Enters in a frame count as one).
+async function enterPlay(page) {
+  await page.keyboard.press('Enter'); await advance(page, 2);
+  await page.keyboard.press('Enter'); await advance(page, 2);
+}
+async function hold(page, key, frames) {
+  await page.keyboard.down(key);
+  await advance(page, frames);
+  await page.keyboard.up(key);
+}
+
 async function staticServer(webDirectory) {
   const contentTypes = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
   const server = http.createServer((request, response) => {
@@ -52,4 +107,4 @@ async function staticServer(webDirectory) {
   return { baseUrl: 'http://localhost:' + server.address().port + '/', close: () => server.close() };
 }
 
-module.exports = { DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, staticServer };
+module.exports = { DEV_HTML, DEV_URL, DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, waitForState, installManualClock, advance, advanceUntil, collectErrors, openWithClock, enterPlay, hold, staticServer };

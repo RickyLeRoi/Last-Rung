@@ -95,7 +95,7 @@ src/
 test/
   harness.js      esegue il gioco in Node con un canvas finto
   run.js          suite di test (regole, fisica, replay, gamepad...)
-  e2e/            collaudo in Chromium vero, una suite per file (keyboard, touch, gamepad, pwa) più lib.js e run.js
+  e2e/            collaudo in Chromium vero, una suite per file (keyboard, touch, gamepad, pwa, devpage, layout, touchui, flow, visual) più lib.js e run.js
   levels.js       ogni livello è risolvibile: il pilota automatico salva ogni persona, una alla volta
 ```
 
