@@ -1,0 +1,12 @@
+{
+  "id": "senza-luce",
+  "title": "Senza Luce",
+  "shortName": "Senza Luce",
+  "lang": "it",
+  "description": "Attraversa la baia di notte senza farti illuminare, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__senzaluce"
+}

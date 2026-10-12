@@ -13,18 +13,12 @@ function beamGeometry() {
 }
 
 function beamContains(x, y) {
-  if (!game.beam.on) return false;
-  const geometry = beamGeometry(), deltaX = x - geometry.x, deltaY = y - geometry.y;
-  if (deltaX <= 0 || Math.hypot(deltaX, deltaY) > geometry.length) return false;
-  return Math.abs(Math.atan2(deltaY, deltaX) - geometry.pitch) <= Math.max(geometry.half, CONFIG.beam.minHalfWidth / deltaX);
+  return game.beam.on && coneContains(beamGeometry(), x, y, CONFIG.beam.minHalfWidth);
 }
 
 // Ships steer by the beam centre line, so they react in a wider band than the one that is visibly lit.
 function beamFollows(x, y) {
-  if (!game.beam.on) return false;
-  const geometry = beamGeometry(), deltaX = x - geometry.x, deltaY = y - geometry.y;
-  if (deltaX <= 0 || Math.hypot(deltaX, deltaY) > geometry.length) return false;
-  return Math.abs(Math.atan2(deltaY, deltaX) - geometry.pitch) <= Math.max(geometry.half, CONFIG.beam.followWidth / deltaX);
+  return game.beam.on && coneContains(beamGeometry(), x, y, CONFIG.beam.followWidth);
 }
 
 // Lit by the beam, the flash, lightning or the port lights.

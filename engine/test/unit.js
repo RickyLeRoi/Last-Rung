@@ -37,6 +37,14 @@ test('clamp e overlap (i bordi che si toccano non si sovrappongono)', () => {
   assert(!overlap(base, { x: 0, y: 10, w: 5, h: 5 }), 'bordo inferiore a contatto');
 });
 
+test('interpolateTable: valori interi, frazionari e fuori tabella', () => {
+  const { interpolateTable } = loadScripts(['engine/core/util.js'], ['interpolateTable']);
+  const table = [8, 22, 36];
+  assertEqual([0, 1, 2].map(index => interpolateTable(table, index)), [8, 22, 36], 'indici interi');
+  assertEqual([interpolateTable(table, 0.5), interpolateTable(table, 1.25)], [15, 25.5], 'indici frazionari');
+  assertEqual([interpolateTable(table, -3), interpolateTable(table, 9)], [8, 36], 'fuori tabella');
+});
+
 test('sprite: makeSprite e outlineSprite', () => {
   const { makeSprite, outlineSprite } = loadScripts(['engine/gfx/sprite.js'], ['makeSprite', 'outlineSprite']);
   assertEqual(makeSprite(['#.', '.#']), { w: 2, h: 2, p: [0, 0, 1, 1] });
@@ -69,6 +77,21 @@ test('geometry: bresenham visita gli estremi e withBounds calcola il riquadro', 
   assertEqual([bounded.x0, bounded.x1, bounded.y0, bounded.y1], [2, 6, 7, 9], 'riquadro');
 });
 
+test('geometry: coneContains (portata, apertura, larghezza minima vicino al vertice, cono verso sinistra)', () => {
+  const { coneContains } = loadScripts(['engine/core/geometry.js'], ['coneContains']);
+  const cone = { x: 0, y: 0, pitch: 0.5, half: 0.1, length: 100 };
+  const onAxis = distance => [Math.cos(0.5) * distance, Math.sin(0.5) * distance];
+  assert(coneContains(cone, ...onAxis(50)), 'punto sulla linea centrale');
+  assert(!coneContains(cone, ...onAxis(101)), 'punto oltre la portata');
+  assert(!coneContains(cone, -10, 5), 'punto dietro il vertice');
+  assert(!coneContains(cone, 50, 0), 'punto fuori apertura (angolo 0 contro 0,5 +- 0,1)');
+  const nearApex = [Math.cos(0.5) * 10 + 2, Math.sin(0.5) * 10 - 3];
+  assert(!coneContains(cone, ...nearApex), 'vicino al vertice il cono e stretto');
+  assert(coneContains(cone, ...nearApex, 7), 'con larghezza minima 7 px il punto vicino al vertice e dentro');
+  const leftCone = { ...cone, facing: -1 }, [axisX, axisY] = onAxis(50);
+  assert(coneContains(leftCone, -axisX, axisY) && !coneContains(leftCone, axisX, axisY), 'il cono verso sinistra e lo specchio di quello verso destra');
+});
+
 test('Replay.codec: codifica e decodifica identiche', () => {
   const { Replay } = loadScripts(['engine/core/util.js', 'engine/core/replay.js'], ['Replay']);
   const codec = Replay.codec({ axes: ['hx', 'winch'], flags: ['stab', 'drop', 'buoy'] });
@@ -95,6 +118,90 @@ test('Weather: vento nullo senza base, deterministico con base; pioggia con Rng 
   Rng.seed(5);
   assertEqual(Weather.initRain(4, 384, 216), first, 'stessa sequenza dal seed');
   assertEqual(first.length, 4, 'numero di gocce');
+});
+
+test('Weather: neve (caduta e deriva lente); i valori di default sono quelli della pioggia di prima', () => {
+  const { Weather, Rng } = loadScripts(['engine/core/util.js', 'engine/world/weather.js'], ['Weather', 'Rng']);
+  const world = { wind: 0, camX: 0, width: 384, height: 216, waterY: () => Infinity, onHitWater() {} };
+  const drops = () => [{ x: 100, y: 50, s: 1 }];
+  const rain = drops(), explicit = drops(), snow = drops();
+  Rng.seed(3); Weather.updateRain(rain, world);
+  Rng.seed(3); Weather.updateRain(explicit, { ...world, fall: 4, fallSpread: 1, drift: 0.5 });
+  Rng.seed(3); Weather.updateRain(snow, { ...world, fall: 0.5, fallSpread: 0.3, drift: 0.1 });
+  assertEqual(rain, explicit, 'default = valori espliciti');
+  assertEqual(rain[0], { x: 100.5, y: 55, s: 1 }, 'pioggia');
+  assertEqual(snow[0], { x: 100.1, y: 50.8, s: 1 }, 'neve');
+});
+
+test('Terrain: materiali, bordi del mondo, scavo e riempimento per materiale, superficie', () => {
+  const { Terrain } = loadScripts(['engine/world/terrain.js'], ['Terrain']);
+  const terrain = Terrain.make(40, 30);
+  Terrain.fillRect(terrain, 0, 20, 40, 10, 2);
+  Terrain.fillRect(terrain, 0, 12, 40, 8, 1);
+  assertEqual([Terrain.get(terrain, 5, 5), Terrain.get(terrain, 5, 15), Terrain.get(terrain, 5, 25)], [0, 1, 2], 'vuoto, neve, roccia');
+  assert(Terrain.isSolid(terrain, -1, 5) && Terrain.isSolid(terrain, 40, 5) && Terrain.isSolid(terrain, 5, 30) && !Terrain.isSolid(terrain, 5, -1), 'fuori dal mondo: pareti e fondo pieni, cielo vuoto');
+  assertEqual(Terrain.surfaceY(terrain, 10, 0), 12, 'superficie');
+  const removed = Terrain.carveCircle(terrain, 10, 16, 4, 1);
+  assert(removed > 20 && Terrain.get(terrain, 10, 19) === 0 && Terrain.get(terrain, 10, 20) === 2, 'lo scavo della neve non tocca la roccia (' + removed + ' celle)');
+  assertEqual(Terrain.surfaceY(terrain, 10, 0), 20, 'la superficie scende fino alla roccia dopo lo scavo');
+  const filled = Terrain.fillCircle(terrain, 10, 16, 4, 1, true);
+  assertEqual(filled, removed, 'riempire solo il vuoto rimette le stesse celle');
+  assert(Terrain.carveCircle(terrain, 30, 25, 3) > 0, 'lo scavo senza materiale toglie anche la roccia');
+  assertEqual(Terrain.carveCircle(terrain, 30, 25, 3), 0, 'un secondo scavo nello stesso punto non toglie nulla');
+});
+
+test('Terrain: settleColumn fa cadere solo il materiale sciolto, una riga per volta', () => {
+  const { Terrain } = loadScripts(['engine/world/terrain.js'], ['Terrain']);
+  const terrain = Terrain.make(5, 12);
+  Terrain.fillRect(terrain, 0, 10, 5, 2, 2);
+  Terrain.fillRect(terrain, 2, 2, 1, 3, 1);
+  Terrain.fillRect(terrain, 3, 4, 1, 1, 2);
+  const moves = [];
+  assertEqual(Terrain.settleColumn(terrain, 2, 1, (x, y) => moves.push([x, y])), 3, 'tre celle di neve scendono insieme');
+  assertEqual(moves, [[2, 5], [2, 4], [2, 3]], 'nuove posizioni, dal basso');
+  assertEqual(Terrain.settleColumn(terrain, 3, 1), 0, 'la roccia sospesa non cade');
+  let frames = 0;
+  while (Terrain.settleColumn(terrain, 2, 1) && frames < 20) frames++;
+  assertEqual([Terrain.get(terrain, 2, 9), Terrain.get(terrain, 2, 7), Terrain.get(terrain, 2, 6)], [1, 1, 0], 'la neve si posa sulla roccia');
+});
+
+test('Terrain: moveRect si ferma sulle pareti, sale i gradini bassi, non attraversa i muri sottili', () => {
+  const { Terrain } = loadScripts(['engine/world/terrain.js'], ['Terrain']);
+  const terrain = Terrain.make(60, 40);
+  Terrain.fillRect(terrain, 0, 30, 60, 10, 2);
+  Terrain.fillRect(terrain, 20, 28, 10, 2, 2);
+  Terrain.fillRect(terrain, 40, 10, 1, 20, 2);
+  const body = { x: 10, y: 20, w: 4, h: 8 };
+  let result = Terrain.moveRect(terrain, body, 0, 5, 0);
+  assert(result.hitY && body.y === 22, 'atterraggio sul pavimento (y ' + body.y + ')');
+  result = Terrain.moveRect(terrain, body, 10, 0, 0);
+  assert(result.hitX && body.x === 16, 'senza gradino si ferma contro lo scalino (x ' + body.x + ')');
+  result = Terrain.moveRect(terrain, body, 10, 0, 2);
+  assert(!result.hitX && body.x === 26 && body.y === 20, 'con gradino 2 sale lo scalino (' + body.x + ', ' + body.y + ')');
+  result = Terrain.moveRect(terrain, body, 30, 0, 2);
+  assert(result.hitX && body.x === 36, 'il muro sottile ferma il corpo (x ' + body.x + ')');
+});
+
+test('Terrain: draw disegna solo la finestra, con bordi bianchi e retino per materiale', () => {
+  const dom = fakeDom();
+  const { Terrain } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js', 'engine/world/terrain.js'], ['Terrain'], { ...dom, CONFIG: { W: 384, H: 216 } });
+  const terrain = Terrain.make(100, 50);
+  Terrain.fillRect(terrain, 0, 30, 100, 20, 1);
+  const pattern = { pattern: true };
+  dom.fills.length = 0;
+  Terrain.draw(terrain, 10, 20, 50, 20, { 1: pattern });
+  assert(dom.fills.every(fill => fill.x >= 10 && fill.x < 60 && fill.y >= 20 && fill.y < 40), 'disegno fuori dalla finestra');
+  assert(dom.fills.some(fill => fill.fillStyle === pattern) && dom.fills.some(fill => fill.fillStyle === '#fff' && fill.y === 30 && fill.w === 1), 'retino o bordo mancanti');
+});
+
+test('Particles: i detriti si posano sul terreno del gioco (hook solidAt)', () => {
+  const { Particles } = loadScripts(['engine/core/util.js', 'engine/world/particles.js'], ['Particles']);
+  const chunk = { t: 'chunk', x: 10, y: 0, w: 2, h: 2, vx: 0.5, vy: 1, life: 400 };
+  const list = [chunk], groundY = 40;
+  const world = { wind: 0, gravity: 0.1, screenHeight: 500, max: 10, waterY: () => Infinity, solids: [], hooks: { solidAt: (x, y, w, h) => y + h > groundY } };
+  for (let i = 0; i < 300; i++) Particles.update(list, world);
+  assert(chunk.y + chunk.h <= groundY && chunk.y + chunk.h > groundY - 1.5, 'il detrito non si posa sul terreno (y ' + chunk.y.toFixed(2) + ')');
+  assertEqual(chunk.vy, 0, 'il detrito resta fermo');
 });
 
 test('Steps: avanza piu passi nello stesso frame e sceglie il testo per dispositivo', () => {

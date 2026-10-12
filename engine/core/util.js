@@ -4,6 +4,13 @@ const round = Math.round;
 const clamp = (value, min, max) => (value < min ? min : value > max ? max : value);
 const overlap = (rectA, rectB) => rectA.x < rectB.x + rectB.w && rectA.x + rectA.w > rectB.x && rectA.y < rectB.y + rectB.h && rectA.y + rectA.h > rectB.y;
 
+// 20261012 ++ RG #interpolate_table
+// Piecewise-linear value of a table at a fractional index, clamped to the table (lanes at a fractional lane number).
+function interpolateTable(values, position) {
+  const index = clamp(position, 0, values.length - 1), lower = Math.floor(index), upper = Math.min(values.length - 1, lower + 1);
+  return values[lower] + (values[upper] - values[lower]) * (index - lower);
+}
+
 function mulberry32(state) {
   return function () {
     state |= 0; state = (state + 0x6D2B79F5) | 0;

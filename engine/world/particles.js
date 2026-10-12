@@ -7,6 +7,7 @@
  *   push(particle, k)    -> external push (rotor downwash)
  *   chunkTrail(chunk)    -> burning-debris trail
  *   splash(x, strength)  -> debris entering the water
+ *   solidAt(x, y, w, h)  -> true when the rectangle touches the game's own terrain (debris lands on it like on solids)
  * The order of Rng calls is part of the replay contract: do not reorder them.
  */
 const Particles = (() => {
@@ -68,6 +69,16 @@ const Particles = (() => {
         if (!(nextX < solid.x + solid.w && nextX + chunk.w > solid.x && nextY < solid.y + solid.h && nextY + chunk.h > solid.y)) continue;
         if (chunk.y + chunk.h <= solid.y + 1) {
           nextY = solid.y - chunk.h; chunk.vy *= -0.3; chunk.vx *= 0.6;
+          if (Math.abs(chunk.vy) < 0.35) chunk.vy = 0;
+        } else {
+          nextX = chunk.x; chunk.vx *= -0.4;
+        }
+        hit = true;
+      }
+      // 20261012 ++ RG #terrain_debris
+      if (hooks.solidAt && hooks.solidAt(nextX, nextY, chunk.w, chunk.h)) {
+        if (hooks.solidAt(chunk.x, nextY, chunk.w, chunk.h)) {
+          nextY = chunk.y; chunk.vy *= -0.3; chunk.vx *= 0.6;
           if (Math.abs(chunk.vy) < 0.35) chunk.vy = 0;
         } else {
           nextX = chunk.x; chunk.vx *= -0.4;

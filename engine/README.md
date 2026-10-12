@@ -19,9 +19,9 @@ Le dipendenze sono solo "a valle": `Lighting`, `UI` e `Input` usano `Gfx`; `Step
 
 | File | Globale | Cosa fa |
 |---|---|---|
-| `core/util.js` | `Rng`, `randomRange`, `chance`, `hashString`, `clamp`, `overlap`, `round`, `todayString`, `mulberry32` | Matematica e RNG deterministico. `Rng.seed(n)` a ogni partita. |
+| `core/util.js` | `Rng`, `randomRange`, `chance`, `hashString`, `clamp`, `overlap`, `round`, `todayString`, `mulberry32`, `interpolateTable` | Matematica e RNG deterministico. `Rng.seed(n)` a ogni partita. `interpolateTable(valori, indice)`: interpolazione lineare a indice frazionario (le corsie). |
 | `core/strings.js` | `STRINGS` | Testi dell'engine (italiano). Il gioco puo' sovrascriverli con `Object.assign(STRINGS, {...})`. |
-| `core/geometry.js` | `bresenham(x0, y0, x1, y1, visit(x, y, index))`, `withBounds(hazard)` | Linee a pixel interi; riquadro `x0/x1/y0/y1` di un pericolo con `pts` piatto. |
+| `core/geometry.js` | `bresenham(x0, y0, x1, y1, visit(x, y, index))`, `coneContains(cone, x, y, minHalfWidth)`, `withBounds(hazard)` | Linee a pixel interi; punto dentro un cono `{ x, y, pitch, half, length, facing }` (pitch sotto l'orizzontale, `facing` -1 = verso sinistra, larghezza minima opzionale vicino al vertice); riquadro `x0/x1/y0/y1` di un pericolo con `pts` piatto. |
 | `core/replay.js` | `Replay.codec({ axes, flags })` | `encode(input)` / `decode(frame)`: frame = `[assi * 100..., bitmask dei flag]`. |
 | `core/loop.js` | `Loop.start(step, render)` | Passo fisso 60 Hz con accumulatore, tetto 250 ms. |
 | `core/steps.js` | `Steps.update(state, steps, onAdvance)`, `Steps.text(step)` | Tutorial a passi con `done()`; il testo dipende dal dispositivo. |
@@ -34,9 +34,10 @@ Le dipendenze sono solo "a valle": `Lighting`, `UI` e `Input` usano `Gfx`; `Step
 | `audio/synth.js` | `Synth.create({ volume, effects(api), loops })` | WebAudio generico. `effects({ tone, noise })` -> mappa nome/funzione; `loops.build({ context, master, noiseSource, filter, gain })` e `loops.update(nodes, levels, now)`. |
 | `input/input.js` | `Input.configure(bindings)`, `sample()`, `syncUI()`, `rumble()`, `device` | Tastiera, gamepad, levetta touch, pulsanti. Vedi sotto. |
 | `world/water.js` | `Water.make / surfaceY(water, x, time) / push / update` | Superficie a molle + onde. |
-| `world/particles.js` | `Particles.add(list, particle, max)`, `Particles.update(list, world)` | Tipi `px`, `bub`, `smoke`, `ring`, `chunk`. Hook: `pixel`, `push`, `chunkTrail`, `splash`. |
-| `world/weather.js` | `Weather.wind / initRain / updateRain / makeBolt / tickLightning` | Vento, pioggia, fulmini. |
-| `world/camera.js` | `Camera.follow / decayShake` | Inseguimento e tremolio. |
+| `world/particles.js` | `Particles.add(list, particle, max)`, `Particles.update(list, world)` | Tipi `px`, `bub`, `smoke`, `ring`, `chunk`. Hook: `pixel`, `push`, `chunkTrail`, `splash`, `solidAt(x, y, w, h)` (i detriti si posano sul terreno del gioco). In un mondo piu' alto dello schermo `world.screenHeight` va passato con l'altezza del mondo, altrimenti le particelle sotto y = altezza + 30 spariscono. |
+| `world/weather.js` | `Weather.wind / initRain / updateRain / makeBolt / tickLightning` | Vento, pioggia, fulmini. `updateRain` accetta `fall`, `fallSpread` e `drift` opzionali (default 4, 1, 0,5 = la pioggia di sempre): valori bassi fanno la neve. |
+| `world/camera.js` | `Camera.follow / decayShake` | Inseguimento e tremolio; `follow` vale anche per l'asse y. |
+| `world/terrain.js` | `Terrain.make / get / isSolid / fillRect / fillCircle / carveCircle / settleColumn / surfaceY / hitsRect / moveRect / draw` | Terreno a maschera di materiali (0 vuoto, gli altri numeri li sceglie il gioco), un pixel per cella; fuori dalla maschera pareti e fondo sono pieni. Scavo e riempimento per materiale, materiale sciolto che cade di una riga per frame (`settleColumn`), movimento a sotto-passi con gradino (`moveRect`), disegno della sola finestra visibile con un retino per materiale (sotto la trasformazione della camera del gioco). La generazione resta nei giochi. |
 | `tools/png.js` | `encodeGrayscalePng(width, height, pixels)` | Solo Node (build e test). |
 
 ## `Input.configure(bindings)`

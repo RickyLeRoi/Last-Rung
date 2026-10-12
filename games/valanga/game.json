@@ -1,0 +1,12 @@
+{
+  "id": "valanga",
+  "title": "Valanga",
+  "shortName": "Valanga",
+  "lang": "it",
+  "description": "Soccorso alpino: trova i sepolti con l'ARTVA e liberali prima che finisca l'aria, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__valanga"
+}

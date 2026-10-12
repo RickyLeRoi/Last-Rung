@@ -21,18 +21,20 @@ async function openPhone(browser, width, height) {
 async function tapUntilPlay(page, width, height) {
   for (let i = 0; i < 8 && (await state(page)).st !== 'play'; i++) { await page.touchscreen.tap(width / 2, height / 2); await advance(page, 3); }
 }
-// White pixels in the band where the rotate message is drawn, one sample per frame.
-const bandCounts = page => page.evaluate(() => {
-  const context = document.getElementById('game').getContext('2d'), counts = [];
+// 20261013 ** RG #bright_background
+// The band where the rotate message is drawn, one sample per frame: a string of '1' (white) and '0', pixel by pixel.
+const bandPixels = page => page.evaluate(() => {
+  const context = document.getElementById('game').getContext('2d'), frames = [];
   for (let frame = 0; frame < 70; frame++) {
     window.__clock.advance(1);
     const pixels = context.getImageData(0, 128, 384, 24).data;
-    let white = 0;
-    for (let i = 0; i < pixels.length; i += 4) if (pixels[i] === 255) white++;
-    counts.push(white);
+    let band = '';
+    for (let i = 0; i < pixels.length; i += 4) band += pixels[i] === 255 ? '1' : '0';
+    frames.push(band);
   }
-  return counts;
+  return frames;
 });
+const differingPixels = (first, second) => { let count = 0; for (let i = 0; i < first.length; i++) if (first[i] !== second[i]) count++; return count; };
 
 module.exports = async (browser, ctx) => {
   let resizablePage = null;
@@ -68,14 +70,15 @@ module.exports = async (browser, ctx) => {
     return overlapping;
   });
   check(overlaps.length === 0, 'layout telefono: i gruppi di pulsanti non si sovrappongono al canvas' + (overlaps.length ? ' (' + overlaps.join(', ') + ')' : ''));
-  const landscape = await bandCounts(phone.page);
+  const landscape = await bandPixels(phone.page);
   await phone.context.close();
 
   const portrait = await openPhone(browser, 390, 844);
   await tapUntilPlay(portrait.page, 390, 844);
-  const rotated = await bandCounts(portrait.page);
+  const rotated = await bandPixels(portrait.page);
   await portrait.context.close();
-  const extraFrames = rotated.filter((count, i) => count > landscape[i] + 100).length;
-  const lessFrames = rotated.filter((count, i) => count < landscape[i]).length;
-  check(extraFrames >= 20 && lessFrames === 0, 'layout telefono verticale: compare "RUOTA IL TELEFONO" (' + extraFrames + ' frame con il messaggio su 70)');
+  // The same frames in both orientations, except for the message: on a dark scene it adds white, on a bright one (snow) its black box
+  // removes about as much as its text adds, so pixels are compared one by one. It blinks: present in about half of the frames.
+  const messageFrames = rotated.filter((band, i) => differingPixels(band, landscape[i]) > 100).length;
+  check(messageFrames >= 20 && messageFrames <= 50, 'layout telefono verticale: compare "RUOTA IL TELEFONO" (' + messageFrames + ' frame con il messaggio su 70)');
 };

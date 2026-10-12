@@ -15,6 +15,15 @@ function bresenham(startX, startY, endX, endY, visit) {
   }
 }
 
+// 20261012 ++ RG #cone_contains
+// cone = { x, y, pitch, half, length, facing }: pitch in radians below the horizontal on the side the cone faces (facing 1 = right,
+// the default, -1 = left), half = half opening angle. minHalfWidth (px, optional) keeps the cone at least that wide near its apex.
+function coneContains(cone, x, y, minHalfWidth) {
+  const deltaX = (x - cone.x) * (cone.facing || 1), deltaY = y - cone.y;
+  if (deltaX <= 0 || Math.hypot(deltaX, deltaY) > cone.length) return false;
+  return Math.abs(Math.atan2(deltaY, deltaX) - cone.pitch) <= Math.max(cone.half, (minHalfWidth || 0) / deltaX);
+}
+
 // Adds x0/x1/y0/y1 (bounding box) to a hazard whose points are a flat [x, y, x, y, ...] list in `pts`.
 function withBounds(hazard) {
   let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;

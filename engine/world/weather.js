@@ -11,11 +11,15 @@ const Weather = (() => {
     return drops;
   }
 
-  // world = { wind, camX, width, height, waterY(x), onHitWater(x, surfaceY) }; drop x is in screen space, waterY wants world space.
+  // world = { wind, camX, width, height, waterY(x), onHitWater(x, surfaceY), fall, fallSpread, drift }; drop x is in screen space,
+  // waterY wants world space. Optional: fall (px per frame, default 4), fallSpread (how much each drop's own speed adds, default 1) and
+  // drift (sideways px per frame without wind, default 0.5): slow values turn the rain into snow.
   function updateRain(drops, world) {
+    // 20261012 ++ RG #snow_fall
+    const fall = world.fall === undefined ? 4 : world.fall, fallSpread = world.fallSpread === undefined ? 1 : world.fallSpread, drift = world.drift === undefined ? 0.5 : world.drift;
     for (const drop of drops) {
-      drop.y += 4 + drop.s;
-      drop.x += world.wind * 1.5 + 0.5;
+      drop.y += fall + drop.s * fallSpread;
+      drop.x += world.wind * 1.5 + drift;
       const waterY = world.waterY(drop.x + world.camX);
       if (drop.y > waterY || drop.y > world.height) {
         if (waterY !== Infinity && drop.y > waterY && chance(0.15)) world.onHitWater(drop.x + world.camX, waterY);

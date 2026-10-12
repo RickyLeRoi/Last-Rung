@@ -4,10 +4,7 @@
 
 const SHIP_LIGHT_HEIGHT = 3;
 
-function laneOffset(laneF) {
-  const offsets = CONFIG.sea.laneOffsets, lower = Math.floor(clamp(laneF, 0, offsets.length - 1)), upper = Math.min(offsets.length - 1, lower + 1);
-  return offsets[lower] + (offsets[upper] - offsets[lower]) * (clamp(laneF, 0, offsets.length - 1) - lower);
-}
+const laneOffset = laneF => interpolateTable(CONFIG.sea.laneOffsets, laneF);
 const shipWaterlineY = ship => waterSurfaceY(ship.x) + laneOffset(ship.laneF);
 const rockWaterlineY = rock => waterSurfaceY(rock.x + 7) + laneOffset(rock.lane);
 
