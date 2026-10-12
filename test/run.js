@@ -3,7 +3,7 @@
 const fs = require('fs');
 const os = require('os');   // 20260930 ** RG #windows_devnull: '/dev/null' does not exist on Windows
 const path = require('path');
-const { boot, flyTo, goTo } = require('./harness');
+const { boot, flyTo, goTo, randomKeysPolicy, place, roofWithoutObstacles } = require('./harness');
 
 const SHOTS = path.join(__dirname, 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
@@ -13,23 +13,6 @@ const tests = [];
 const test = (name, testBody) => tests.push({ name, fn: testBody });
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
-const randomKeysPolicy = seed => frame => {
-  const scrambled = Math.sin((frame + seed) * 12.9898) * 43758.5453, fraction = scrambled - Math.floor(scrambled);
-  const keys = [];
-  if (fraction < 0.55) keys.push('ArrowUp');
-  if ((fraction * 7) % 1 < 0.3) keys.push('ArrowLeft'); else if ((fraction * 13) % 1 < 0.4) keys.push('ArrowRight');
-  return keys;
-};
-function place(harness, x, y, velocityX = 0, velocityY = 0) {
-  const heli = harness.game.heli;
-  heli.ground = null; heli.x = x; heli.y = y; heli.px = x; heli.py = y; heli.vx = velocityX; heli.vy = velocityY;
-}
-function roofWithoutObstacles(game) {
-  const level = game.L;
-  return level.solids.find(solid => solid.kind === 'bld' && !solid.safe && solid.w >= 50 &&
-    !level.fires.some(fire => fire.x < solid.x + solid.w && fire.x + fire.w > solid.x) &&
-    !level.haz.some(hazard => hazard.x1 >= solid.x - 4 && hazard.x0 <= solid.x + solid.w + 4 && hazard.y1 < solid.y + 2 && hazard.y0 < solid.y));
-}
 function dropOnto(level, dropHeight, initialVelocityX, keys) {
   const harness = boot(); const game = harness.play(harness.hook.levelSpec(level));
   const rooftop = roofWithoutObstacles(game);

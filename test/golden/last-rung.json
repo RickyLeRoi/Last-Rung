@@ -1,0 +1,510 @@
+{
+ "game": "last-rung",
+ "scenarios": {
+  "G01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "state": "91a8e24a2109bdb8913cc7be19ce66c3985ed7e3",
+     "frame": "71a11fd6ff7995c442ae158ea6f7af5dfb9ba4d4"
+    }
+   ],
+   "end": {
+    "state": "title",
+    "frame": 240,
+    "score": 0
+   },
+   "rng": 0.4017836560960859
+  },
+  "G02": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "229f3f0a620c384e71f8946041d17907979fe7cb",
+     "frame": "6d969f6be200bb0e18fa8a7c42809ec81aa33354"
+    },
+    {
+     "at": 600,
+     "state": "63019797c6f137a84124bc2d09454d8f8c51a7a2",
+     "frame": "dcef1c7566e2ab39be2a875fe039904436b422fb"
+    },
+    {
+     "at": 900,
+     "state": "518a19de22b263e47b6c17632178fae0d921cb5e",
+     "frame": "ebaae994a76f01ffc60b2f50c91dd8da40cb1857"
+    },
+    {
+     "at": 1200,
+     "state": "60ee1084d14cb7de64f2353e704dcf2413ad26da",
+     "frame": "56c9a6fe439a7a0a9ce27bea83ec1d70df0dd834"
+    },
+    {
+     "at": 1500,
+     "state": "1f74b5e0ea31eca4933c5ff49370f17d6e8f5c7e",
+     "frame": "b0d37118a020b8b4ee08819db1fb397a7e2c9bb6"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1505,
+    "score": 0
+   },
+   "rng": 0.7372253846842796
+  },
+  "G03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "035b1a36f9bcd95c48cda38d45cb72487d593c3d",
+     "frame": "478efead87120085089552cf8941ee9a5771827c"
+    },
+    {
+     "at": 600,
+     "state": "085f05b1f89359bc6ec23d2746f01d2a4538cf75",
+     "frame": "b2248f520ec67b6546a611c0d5cf0ef15d584b65"
+    },
+    {
+     "at": 900,
+     "state": "41f2e9cd286defdfb4b03bfb41485643244018b3",
+     "frame": "5cea71e42f961f670868062313ba14d8dda27021"
+    },
+    {
+     "at": 1200,
+     "state": "358c9f3acb32eaa8c7f1944bc05dfa8e3fce217f",
+     "frame": "12083d7254382875bb4bc8fd9d53b6870cb55c19"
+    },
+    {
+     "at": 1500,
+     "state": "1c4338fed3126716209edcc2eb43e2b52cd1e337",
+     "frame": "78c69d288f69fdf414667e2f0060e4d0360e847e"
+    },
+    {
+     "at": 1800,
+     "state": "94a20edec3635133349106a55c79eb879e4d6acd",
+     "frame": "2bef29c2598535fe1eefaf974e1aa079e1769c09"
+    },
+    {
+     "at": 2100,
+     "state": "9a3aeb3da737fc61e348031dbe28c74d7ffcfd19",
+     "frame": "daa791b659db1e479b0a03bdc244b1cc200835e7"
+    },
+    {
+     "at": 2400,
+     "state": "d04469ce4ca6c86f3b94bc1f7c2233535e0ccd3f",
+     "frame": "6546e3b3b05e0e41ade5500e3879eda480194024"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.5595883694477379
+  },
+  "G04": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "033e04fa1e68dad46bbd0037b047673f917b68f6",
+     "frame": "a7a72381d54defef2524b77d524e098082f1d47c"
+    },
+    {
+     "at": 600,
+     "state": "f222ec30c0f41fa95dc8572eb62430e91c753ac2",
+     "frame": "2932b4afdc40f946cbdc7b8a84ac9ff483752017"
+    },
+    {
+     "at": 900,
+     "state": "64fc9d45e5a50b1e45717167a4b4aa257cc22a1a",
+     "frame": "7a5c3d82ddd88006c2d4c1bc643f300f125280db"
+    },
+    {
+     "at": 1200,
+     "state": "f36b97e9817b1965dbdb219ee7e84715320698a8",
+     "frame": "6fd60e7a9b92ae36f8e3d2f0ed9dcc64d2e9df0b"
+    },
+    {
+     "at": 1500,
+     "state": "3b9fe6b5d12ae797db14198f5c627b0c24f14c60",
+     "frame": "ad984e102740b19a4886cf0cd8c167735b9dfcb5"
+    },
+    {
+     "at": 1800,
+     "state": "56f07fd831b1782de199dae3e56622a880db8366",
+     "frame": "f0726efe2638679fb58fcc4e8b5ac950ae9bf19b"
+    },
+    {
+     "at": 2100,
+     "state": "364e6049bffc61dd2756418728642c12f83b7d3f",
+     "frame": "2c0a4169979daeebd49e13ceaa887fb86286eb98"
+    },
+    {
+     "at": 2400,
+     "state": "6e5a231dfbd77d65bbbbd647157bd0ec954840aa",
+     "frame": "4c31b11b0f4a2ffee521694243f3afa2620673bc"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.2113511231727898
+  },
+  "G05": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "019e7ffbe9293e12962a210d64f955322a89d3d7",
+     "frame": "dd5a990a7e25d0239229ab53be5a6199001a7524"
+    },
+    {
+     "at": 600,
+     "state": "a00a84fee223074e190559ba682845724652b653",
+     "frame": "4553d2ef44ccfd0e6afeb8b7745f90a4c2d89b81"
+    },
+    {
+     "at": 900,
+     "state": "598b6ce52354a0ca6ade055d417b78ea22b3d3da",
+     "frame": "fff9086b0bd80be9ec75ad86b1db2b40d66b0cd3"
+    },
+    {
+     "at": 1200,
+     "state": "0a4120bf4831b4bc005eb52b086805139080be16",
+     "frame": "5bf8ad786436643c48e3876529124665423eafeb"
+    },
+    {
+     "at": 1500,
+     "state": "a4819c002a44ffb8a4a4e8b95ffe4c8491d01139",
+     "frame": "8f994ae8cc79bd59e5c392bfecdd648f2ce62898"
+    },
+    {
+     "at": 1800,
+     "state": "422665ca30060f354426fb51627e732cf8be43ec",
+     "frame": "29a60a001098b6ba2641cf5798b4a835342526ff"
+    },
+    {
+     "at": 2100,
+     "state": "b4e6fea632257708aaf05886eea8fa29d9d48bf1",
+     "frame": "406fc3518e260441f0e42eb49fdcbca3f07961f3"
+    },
+    {
+     "at": 2400,
+     "state": "53756f5512036e508e6054c8a4841bbb9ad9c906",
+     "frame": "e804b545d14276c4285909c434a558a38c76414d"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2402,
+    "score": 0
+   },
+   "rng": 0.8659104225225747
+  },
+  "G06": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "2e561869e38c2aee8cedcab9f4abafcc1c28edd6",
+     "frame": "d661e6f98d31fdb58eb20fc6c80540872ec843b3"
+    },
+    {
+     "at": 600,
+     "state": "f9d4d62b21fe1e9f3ac6d8ecdcfae5cae95452f4",
+     "frame": "c9ed94323d6d4892aa345833c52f565072525d93"
+    },
+    {
+     "at": 900,
+     "state": "ce49971438ce0481e5bd37be579ed7256f49f5cf",
+     "frame": "491cb8a4b02883728c1e205602a43a89e18a2848"
+    },
+    {
+     "at": 1200,
+     "state": "6730c4771cab3552f5af4437f06129dab82ee3e8",
+     "frame": "8d4785c6964c4dc3e6fbdee9c75b89292adf9501"
+    },
+    {
+     "at": 1500,
+     "state": "bbbe13b448b4602dee340ad9e98091e5718a5edd",
+     "frame": "8d6a12f4fbf0f952638ec86cbfea1543e5b96c3e"
+    },
+    {
+     "at": 1800,
+     "state": "9783f9b35058b229987006c09b939f2b975f45ea",
+     "frame": "05f42e6e3deba1357dd463647abe8fc708ee2032"
+    },
+    {
+     "at": 2100,
+     "state": "c30c79dca41acf2b13a5c16859afb205e0cdaf19",
+     "frame": "17540bec3806f8f83c1009f1b5f4e30f4a997315"
+    },
+    {
+     "at": 2400,
+     "state": "138312fee8801380a56753d01afdc888938732b6",
+     "frame": "bfed30f22d273b7899c24d6e372d3024d96de092"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.08199733356013894
+  },
+  "G07": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "073df5fc7f9206afd12d890949459f51f3326fc2",
+     "frame": "66fd3fd9b9380b6d107fd9709eac19d0fc5d5970"
+    },
+    {
+     "at": 600,
+     "state": "eca50d4ac5405fe8a4a459ee16638db3f258fbd1",
+     "frame": "a27ca5aed8543de5b2d67503a42042dae2eb5aaa"
+    },
+    {
+     "at": 900,
+     "state": "fa3a02765f633e5f0a27d15d954ae1663adda6a5",
+     "frame": "e38c035b9cd5e44612301b9272a1f46089ec639b"
+    },
+    {
+     "at": 1200,
+     "state": "5899c90a8be54772405369584292360508df74fe",
+     "frame": "e627637c3dafcc88063bd01055b3d3053fd3baf7"
+    },
+    {
+     "at": 1500,
+     "state": "289d31a4967c40d5f953ff78c38ccf23601a1e0e",
+     "frame": "bed0c8698d6c2d9ba92fd333a95178fe13d16574"
+    },
+    {
+     "at": 1800,
+     "state": "e7e2b6a8f4be42fbdaa920ce4b8f7f9506e7f1e7",
+     "frame": "4727c71db81250fb9ada73aefa456b7a1044b80d"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1801,
+    "score": 0
+   },
+   "rng": 0.734673360362649
+  },
+  "G08": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "4641608120e6b007964fd15c34c7503acbf6bdbb",
+     "frame": "7a46af12b3b53021bdce61f78853c970718654a7"
+    },
+    {
+     "at": 600,
+     "state": "474ef72136fe42c8d6396ce8c20af74bebd1e243",
+     "frame": "a7c298e04e36271a40844f000196032c9d95416f"
+    },
+    {
+     "at": 900,
+     "state": "b9104d9e16c5585c2c17b923ee1dd6bdc6c16b44",
+     "frame": "c83a34971668fdb801d689b1512451f20d1fc50e"
+    },
+    {
+     "at": 1200,
+     "state": "88b024beefc5ddf55d842e116747536a9ec34dc6",
+     "frame": "2bf24996ce0b767f25966504159b16db8f6cbc97"
+    },
+    {
+     "at": 1500,
+     "state": "eb7d2f28316139f901c3fa979f97ec2d1fbdc16f",
+     "frame": "c73fc0d683c44b81b920fddaca1413ecdd85819f"
+    },
+    {
+     "at": 1800,
+     "state": "fba30b7b97188424ca469a5cf8fb7e109fc8872f",
+     "frame": "f53cf6a4b0e9394d191436fca5e29a83fa5b1c35"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1801,
+    "score": 0
+   },
+   "rng": 0.683562426129356
+  },
+  "G09": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "f64a6b6525f21e46e92bb62a2057a76d0a3b4769",
+     "frame": "59d00d3481c68cbe622468fb7005ce37a08efe31"
+    },
+    {
+     "at": 600,
+     "state": "9a4073ce02133fe74d796ad696b0975d8a3c7aa2",
+     "frame": "649be8dfdf3dead3905c286d9de8565f25c963c0"
+    },
+    {
+     "at": 900,
+     "state": "ffbb71f9fd3e7d91850224f0e3c8a33aee271609",
+     "frame": "17532fafd58ee90e6910603ba135ec87a7e0d680"
+    },
+    {
+     "at": 1200,
+     "state": "90f50c44892d4c0e90b2de95b3a2dc7dfaaf6248",
+     "frame": "73f46be7e2b3ecab397f34cec47dca2a0107d2f5"
+    },
+    {
+     "at": 1500,
+     "state": "22834545cd6c0ed8ffc390838be4dfe4d2c7076a",
+     "frame": "41721e3640822bf0228ea4bca5c4b1e25bdb6cbf"
+    },
+    {
+     "at": 1800,
+     "state": "7ae573b330743a8bcdc2e1a8187c9cd31d7592cf",
+     "frame": "106174823d8f52393504f319fd514ab4e99e0cdd"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1801,
+    "score": 0
+   },
+   "rng": 0.18486466398462653
+  },
+  "G10": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "80aded8d227a71fae8989fe3979a809cd757be97",
+     "frame": "746457c071b664c28159d9ecd80e4dea9ee7a5e5"
+    },
+    {
+     "at": 600,
+     "state": "0f08f8dfbf26b15db02ffaff2fefe81321efc2ca",
+     "frame": "b467b566ce9911d46942d73277db7c53b2ce02cf"
+    },
+    {
+     "at": 900,
+     "state": "b016e50da071375928a869cd472cac97c53b078e",
+     "frame": "af1a8b2694755f7e78eb686b9a39ba60fa91d807"
+    },
+    {
+     "at": 1200,
+     "state": "5e7e42be642f5efc14799ba67610fbb10152c8d2",
+     "frame": "7bf092cae49ab2d434b362c71cc1adba74c3c6b0"
+    },
+    {
+     "at": 1500,
+     "state": "562b989462649ea7f79bf2dcbec46472df9f7393",
+     "frame": "3d3528ff82ea0450c5b2242f8aa580cee9061bac"
+    },
+    {
+     "at": 1800,
+     "state": "c46ffbe2d75ed4bbb08265470bf00cf95c735592",
+     "frame": "b75844449af411abe1ee8b99606731eedc906311"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1801,
+    "score": 0
+   },
+   "rng": 0.6118104169145226
+  },
+  "G11": {
+   "checkpoints": [
+    {
+     "at": 1280,
+     "state": "e3cb35e03ebbf01afd4dc4ba99b00563935e97a3",
+     "frame": "6dd0270388cfa32684544f7ed2be585de9f30f12"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1280,
+    "score": 100
+   },
+   "rng": 0.13590514822863042
+  },
+  "G12": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "f0590b67012a4d9c935857a033085cae5b4722b6",
+     "frame": "61389982fc740b90bb45ea8d0235a784bad7a83c"
+    }
+   ],
+   "end": {
+    "state": "over",
+    "frame": 301,
+    "score": 0
+   },
+   "rng": 0.7162857896182686
+  },
+  "G13": {
+   "checkpoints": [
+    {
+     "at": 200,
+     "state": "915ab102360621786a0aa0616c2642cb22997ba8",
+     "frame": "2cd3c8fd2a7b9667ca949ad4c67e5fea857db296"
+    }
+   ],
+   "end": {
+    "state": "done",
+    "frame": 201,
+    "score": 250
+   },
+   "rng": 0.5491732109803706
+  },
+  "G14": {
+   "checkpoints": [
+    {
+     "at": "registrata",
+     "state": "63355d0781a91aca7119951ba14a640fa00d2fa5",
+     "frame": "386899c5a1555519583856f4b3ba3a534d0425f5"
+    },
+    {
+     "at": "replay",
+     "state": "63355d0781a91aca7119951ba14a640fa00d2fa5",
+     "frame": "4c31b11b0f4a2ffee521694243f3afa2620673bc"
+    }
+   ],
+   "end": {
+    "state": "replay",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.2113511231727898
+  },
+  "G15": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "3fded3e0d9e6ccb76d7842a9d399276b88e1bfb4",
+     "frame": "b90182dae1d0acfa483bfccc272d40f47b254180"
+    },
+    {
+     "at": 600,
+     "state": "ab78e735096aa8e502d1c7de121e7846eeef4e4c",
+     "frame": "ed8ea96da27b492caaf198875057e2642a688070"
+    },
+    {
+     "at": 900,
+     "state": "d9cb04ce5b554f8150adc0f48f0a79496219c7d9",
+     "frame": "80e15544057433684900e677d5f080a8346fe7c7"
+    },
+    {
+     "at": 1200,
+     "state": "d0bf82d9d6da4fad9ab0755a8e7242a51d1822c4",
+     "frame": "1bab197a63b6ebf317ff251eb0c016c44a335fc5"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1201,
+    "score": 0
+   },
+   "rng": 0.7033840965013951
+  }
+ }
+}

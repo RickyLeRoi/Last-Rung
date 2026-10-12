@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 const DIST = path.join(__dirname, '..', 'dist', 'last-rung.html');
 const W = 384, H = 216;
@@ -27,8 +28,41 @@ function writePng(pixelBuffer, file, scale = 3) {
   fs.writeFileSync(file, Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', headerData), chunk('IDAT', zlib.deflateSync(rawScanlines)), chunk('IEND', Buffer.alloc(0))]));
 }
 
+
+// Deterministic replacement for Math.random in the game sandbox: it only feeds rendering and audio, never the simulation.
+function seededRandom(seed) {
+  let state = seed | 0;
+  return {
+    next() {
+      state = (state + 0x6D2B79F5) | 0;
+      let mixed = Math.imul(state ^ (state >>> 15), 1 | state);
+      mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed;
+      return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
+    },
+    save: () => state,
+    restore(saved) { state = saved; },
+  };
+}
+
+
+// Stable text form of any game object: numbers fixed to 6 decimals, keys sorted, shared level objects replaced by their index.
+function encodeStable(value, knownObjects, path = []) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value.toFixed(6) : String(value);
+  if (value === undefined || typeof value === 'function') return null;
+  if (value === null || typeof value !== 'object') return value;
+  if (path.length && knownObjects.has(value)) return knownObjects.get(value);
+  if (path.includes(value) || path.length > 8) return '[cycle]';
+  const nextPath = path.concat([value]);
+  if (Array.isArray(value)) return value.map(item => encodeStable(item, knownObjects, nextPath));
+  const encoded = {};
+  for (const key of Object.keys(value).sort()) encoded[key] = encodeStable(value[key], knownObjects, nextPath);
+  return encoded;
+}
+const sha1 = bytes => crypto.createHash('sha1').update(bytes).digest('hex');
+
 function boot(options = {}) {
   const source = loadSource();
+  const seededMath = options.seededMath === undefined ? null : seededRandom(options.seededMath);
   const pixelBuffer = new Uint8Array(W * H);
   const stats = { nonInt: 0, badColor: 0 };
   let offsetX = 0, offsetY = 0, fill = '#fff', compositeOperation = 'source-over', capture = false;
@@ -73,6 +107,7 @@ function boot(options = {}) {
     requestAnimationFrame: callback => { animationFrameCallback = callback; },
     __TEST_HOOK__: testHook => { hook = testHook; },
   };
+  if (seededMath) sandbox.Math = Object.assign(Object.create(Math), { random: seededMath.next });
   new Function(...Object.keys(sandbox), source)(...Object.values(sandbox));
 
   const fire = (type, code) => (listeners[type] || []).forEach(listener => listener({ code, preventDefault() {} }));
@@ -89,6 +124,32 @@ function boot(options = {}) {
     },
     tap(code) { driver.keyDown(code); driver.tick(); driver.keyUp(code); },
     hold(keys, count) { for (let i = 0; i < count; i++) { driver.set(keys); driver.tick(); } },
+    // Renders the current state once without advancing the simulation and without consuming the seeded Math.random sequence.
+    frameHash() {
+      const savedRandom = seededMath ? seededMath.save() : null;
+      capture = true; animationFrameCallback(now); capture = false;
+      if (seededMath) seededMath.restore(savedRandom);
+      return sha1(pixelBuffer);
+    },
+    stateHash(options = {}) {
+      const game = hook.game, level = game.L, knownObjects = new Map();
+      level.solids.forEach((solid, i) => knownObjects.set(solid, 'solid:' + i));
+      level.people.forEach((person, i) => knownObjects.set(person, 'person:' + i));
+      level.fires.forEach((fire, i) => knownObjects.set(fire, 'fire:' + i));
+      const personFields = ['state', 'x', 'y', 'vx', 'vy', 'kind', 'injured', 't'];
+      const snapshot = {
+        heli: encodeStable(game.heli, knownObjects),
+        people: level.people.map(person => encodeStable(Object.fromEntries(personFields.map(field => [field, person[field]])), knownObjects)),
+        saved: level.saved, dead: level.dead, total: level.total, killedByPlayer: level.killedByPlayer,
+        score: game.score, particles: game.parts.length, wind: encodeStable(game.wind, knownObjects), camX: encodeStable(game.camX, knownObjects),
+        fires: level.fires.map(fire => encodeStable({ hp: fire.hp, press: fire.press }, knownObjects)),
+        frame: game.frame,
+      };
+      if (!options.ignoreState) snapshot.state = game.state;
+      return sha1(JSON.stringify(snapshot));
+    },
+    // Consumes one number: call it last in a scenario. A changed order of Rng calls shows up here even when the state looks equal.
+    rngProbe() { return hook.Rng.next(); },
     get buf() { return pixelBuffer; },
     shot(file) { capture = true; now += 1000 / 60 + 1e-7; animationFrameCallback(now); capture = false; writePng(pixelBuffer, file); },
     play(spec) { hook.startLevel(spec, 0); hook.game.state = 'play'; driver.tick(); return hook.game; },
@@ -114,4 +175,22 @@ function goTo(driver, getTargetX, getTargetY, maxSpeed, limit = 3000) {
   return false;
 }
 
-module.exports = { boot, flyTo, goTo, W, H };
+const randomKeysPolicy = seed => frame => {
+  const scrambled = Math.sin((frame + seed) * 12.9898) * 43758.5453, fraction = scrambled - Math.floor(scrambled);
+  const keys = [];
+  if (fraction < 0.55) keys.push('ArrowUp');
+  if ((fraction * 7) % 1 < 0.3) keys.push('ArrowLeft'); else if ((fraction * 13) % 1 < 0.4) keys.push('ArrowRight');
+  return keys;
+};
+function place(harness, x, y, velocityX = 0, velocityY = 0) {
+  const heli = harness.game.heli;
+  heli.ground = null; heli.x = x; heli.y = y; heli.px = x; heli.py = y; heli.vx = velocityX; heli.vy = velocityY;
+}
+function roofWithoutObstacles(game) {
+  const level = game.L;
+  return level.solids.find(solid => solid.kind === 'bld' && !solid.safe && solid.w >= 50 &&
+    !level.fires.some(fire => fire.x < solid.x + solid.w && fire.x + fire.w > solid.x) &&
+    !level.haz.some(hazard => hazard.x1 >= solid.x - 4 && hazard.x0 <= solid.x + solid.w + 4 && hazard.y1 < solid.y + 2 && hazard.y0 < solid.y));
+}
+
+module.exports = { boot, flyTo, goTo, randomKeysPolicy, place, roofWithoutObstacles, W, H };
