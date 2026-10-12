@@ -95,14 +95,14 @@ src/
 test/
   harness.js      esegue il gioco in Node con un canvas finto
   run.js          suite di test (regole, fisica, replay, gamepad...)
-  browser.js      collaudo in Chromium vero (palette, touch, audio, gamepad, vibrazione, app offline)
+  e2e/            collaudo in Chromium vero, una suite per file (keyboard, touch, gamepad, pwa) più lib.js e run.js
   levels.js       ogni livello è risolvibile: il pilota automatico salva ogni persona, una alla volta
 ```
 
 ## Requisiti
 
 - Node.js 18 o successivo e `npm install` (una volta sola) per `build.js` e i test. L'unica dipendenza è `terser`, usata solo in fase di build per minificare il JS: il gioco non ne ha. Per giocare non serve nulla.
-- Playwright con Chromium, solo per `test/browser.js`. Non è una dipendenza del progetto: si installa a parte con `npm install -g playwright` e `npx playwright install chromium`.
+- Playwright con Chromium, solo per `test/e2e/run.js`. Non è una dipendenza del progetto: si installa a parte con `npm install -g playwright` e `npx playwright install chromium`.
 
 ## Sviluppo
 
@@ -111,10 +111,10 @@ npm install                                     # una volta sola (terser)
 node build.js                                   # genera dist/last-rung.html e dist/web/, minificati
 node test/run.js                                # suite di test, 40 test (filtro opzionale: node test/run.js replay)
 node test/levels.js                             # livelli 1-16 e 20 sfide del giorno risolvibili (~2 minuti)
-NODE_PATH=$(npm root -g) node test/browser.js   # collaudo nel browser (serve Playwright)
+NODE_PATH=$(npm root -g) node test/e2e/run.js   # collaudo nel browser (serve Playwright; filtro: node test/e2e/run.js touch)
 ```
 
-Su PowerShell l'ultimo comando diventa `$env:NODE_PATH = (npm root -g); node test/browser.js`. Gli screenshot dei test finiscono in `test/shots/`, cartella ignorata da git.
+Su PowerShell l'ultimo comando diventa `$env:NODE_PATH = (npm root -g); node test/e2e/run.js`. Gli screenshot dei test finiscono in `test/shots/`, cartella ignorata da git.
 
 Durante lo sviluppo si può aprire direttamente `index.html`: i sorgenti sono script classici e funzionano anche da `file://`, senza build. I test girano su `dist/`, quindi dopo ogni modifica ai sorgenti serve `node build.js`.
 
