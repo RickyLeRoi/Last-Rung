@@ -6,7 +6,7 @@ Rilasciato con licenza [MIT](LICENSE).
 
 ## Giocare
 
-Apri `dist/last-rung.html` nel browser (doppio clic). Funziona con tastiera, gamepad e touch.
+`dist/` non è versionato: prima genera il gioco con `npm install && node build.js`, poi apri `dist/last-rung.html` nel browser (doppio clic). Funziona con tastiera, gamepad e touch. In alternativa si gioca online su GitHub Pages (vedi [Pubblicare](#pubblicare)).
 
 Per installarlo sul telefono come app (anche offline), pubblica la cartella `dist/web/` su un sito https: contiene lo stesso gioco più manifest, icone e service worker. Dal browser del telefono poi "Aggiungi a schermata Home". Dettagli, e pubblicazione automatica su GitHub Pages, in [Pubblicare](#pubblicare).
 
@@ -65,7 +65,7 @@ Parametri URL: `?livello=N` parte dal livello N (senza addestramento), `?notte` 
 index.html        pagina di sviluppo: carica i sorgenti separati
 build.js          unisce e minifica tutto in dist/last-rung.html (un solo file) e prepara dist/web/ (app installabile)
 package.json      solo dipendenze di build (terser)
-dist/             output della build, minificato e versionato: si gioca subito anche senza ricompilare
+dist/             output della build, minificato; non versionato (ignorato da git), si genera con node build.js
 LICENSE           licenza MIT
 .github/workflows/pages.yml   build, test e pubblicazione di dist/web/ su GitHub Pages
 src/
@@ -109,7 +109,7 @@ test/
 ```sh
 npm install                                     # una volta sola (terser)
 node build.js                                   # genera dist/last-rung.html e dist/web/, minificati
-node test/run.js                                # suite di test, 39 test (filtro opzionale: node test/run.js replay)
+node test/run.js                                # suite di test, 40 test (filtro opzionale: node test/run.js replay)
 node test/levels.js                             # livelli 1-16 e 20 sfide del giorno risolvibili (~2 minuti)
 NODE_PATH=$(npm root -g) node test/browser.js   # collaudo nel browser (serve Playwright)
 ```
