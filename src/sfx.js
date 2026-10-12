@@ -1,29 +1,7 @@
+// src/sfx.js
 'use strict';
 const Sfx = (() => {
-  const AudioContextClass = typeof AudioContext !== 'undefined' ? AudioContext
-    : typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : null;
-  const MASTER_VOLUME = 0.5;
-  let audioContext = null, masterGain = null, noiseBuffer = null, loops = null, muted = false, playListener = null;
-  const lastPlay = {};
-
-  function unlock() {
-    if (!AudioContextClass) return;
-    if (audioContext) { if (audioContext.state === 'suspended') audioContext.resume(); return; }
-    try { audioContext = new AudioContextClass(); } catch (error) { audioContext = null; return; }
-    masterGain = audioContext.createGain();
-    masterGain.gain.value = muted ? 0 : MASTER_VOLUME;
-    masterGain.connect(audioContext.destination);
-    noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 2, audioContext.sampleRate);
-    const samples = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;   // audio only: never touches the simulation RNG
-    buildLoops();
-  }
-
-  function noiseSource() { const source = audioContext.createBufferSource(); source.buffer = noiseBuffer; source.loop = true; return source; }
-  function filter(type, frequency, qualityFactor) { const biquad = audioContext.createBiquadFilter(); biquad.type = type; biquad.frequency.value = frequency; if (qualityFactor) biquad.Q.value = qualityFactor; return biquad; }
-  function gain(value) { const gainNode = audioContext.createGain(); gainNode.gain.value = value; return gainNode; }
-
-  function buildLoops() {
+  function buildLoops({ context: audioContext, master: masterGain, noiseSource, filter, gain }) {
     // Rotor: band-passed noise, volume modulated by a square wave at blade-pass frequency
     const rotorNoise = noiseSource(), rotorFilter = filter('bandpass', 380, 0.8), chop = gain(0);
     const bladeOscillator = audioContext.createOscillator(); bladeOscillator.type = 'square'; bladeOscillator.frequency.value = 18;
@@ -39,13 +17,12 @@ const Sfx = (() => {
     const winchFilter = filter('bandpass', 700, 2), winchGain = gain(0);
     winchOscillator.connect(winchFilter); winchFilter.connect(winchGain); winchGain.connect(masterGain);
     rotorNoise.start(); bladeOscillator.start(); engineOscillator.start(); windNoise.start(); winchOscillator.start();
-    loops = { chop, lfo: bladeOscillator, lfoAmt: bladeOscillatorDepth, rf: rotorFilter, eo: engineOscillator, eg: engineGain, sg: windGain, wg: winchGain, wo: winchOscillator };
+    return { chop, lfo: bladeOscillator, lfoAmt: bladeOscillatorDepth, rf: rotorFilter, eo: engineOscillator, eg: engineGain, sg: windGain, wg: winchGain, wo: winchOscillator };
   }
 
   // Called every frame; levels = { rotor, thrust, storm, water, winch }, each 0..1.
-  function update(levels) {
-    if (!audioContext || !loops) return;
-    const now = audioContext.currentTime, smoothing = 0.08;
+  function updateLoops(loops, levels, now) {
+    const smoothing = 0.08;
     loops.lfo.frequency.setTargetAtTime(9 + 13 * levels.rotor + 5 * levels.thrust, now, smoothing);
     loops.chop.gain.setTargetAtTime(0.1 * levels.rotor, now, smoothing);
     loops.lfoAmt.gain.setTargetAtTime(0.09 * levels.rotor, now, smoothing);
@@ -57,30 +34,7 @@ const Sfx = (() => {
     loops.wo.frequency.setTargetAtTime(95 + 20 * Math.sin(now * 9), now, 0.05);
   }
 
-  function tone(startFrequency, endFrequency, duration, type, volume, delay) {
-    const startTime = audioContext.currentTime + (delay || 0);
-    const oscillator = audioContext.createOscillator(), gainNode = gain(0);
-    oscillator.type = type || 'square';
-    oscillator.frequency.setValueAtTime(startFrequency, startTime);
-    if (endFrequency !== startFrequency) oscillator.frequency.exponentialRampToValueAtTime(Math.max(20, endFrequency), startTime + duration);
-    gainNode.gain.setValueAtTime(volume, startTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-    oscillator.connect(gainNode); gainNode.connect(masterGain);
-    oscillator.start(startTime); oscillator.stop(startTime + duration + 0.02);
-  }
-  function noise(duration, type, startFrequency, endFrequency, volume, delay) {
-    const startTime = audioContext.currentTime + (delay || 0);
-    const source = audioContext.createBufferSource(); source.buffer = noiseBuffer;
-    const filterNode = filter(type, startFrequency, 1), gainNode = gain(0);
-    filterNode.frequency.setValueAtTime(startFrequency, startTime);
-    filterNode.frequency.exponentialRampToValueAtTime(Math.max(20, endFrequency), startTime + duration);
-    gainNode.gain.setValueAtTime(volume, startTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-    source.connect(filterNode); filterNode.connect(gainNode); gainNode.connect(masterGain);
-    source.start(startTime, Math.random() * 1.5); source.stop(startTime + duration + 0.02);
-  }
-
-  const EFFECTS = {
+  const effects = ({ tone, noise }) => ({
     ui()       { tone(660, 990, 0.06, 'square', 0.08); },
     hook()     { tone(880, 1320, 0.09, 'square', 0.1); },
     board()    { tone(660, 880, 0.06, 'triangle', 0.1); },
@@ -105,22 +59,7 @@ const Sfx = (() => {
     dump()     { noise(0.9, 'lowpass', 2500, 300, 0.3); },
     hiss()     { noise(1.2, 'highpass', 5000, 2000, 0.18); },
     fail()     { [392, 330, 262].forEach((frequency, i) => tone(frequency, frequency * 0.98, 0.2, 'triangle', 0.14, i * 0.18)); },
-  };
+  });
 
-  function play(name) {
-    if (playListener) playListener(name);   // haptics, also when muted
-    if (!audioContext || muted || !EFFECTS[name]) return;
-    const now = audioContext.currentTime;
-    if (lastPlay[name] && now - lastPlay[name] < 0.05) return;
-    lastPlay[name] = now;
-    try { EFFECTS[name](); } catch (error) { /* audio is not essential */ }
-  }
-
-  function toggleMute() {
-    muted = !muted;
-    if (masterGain) masterGain.gain.setTargetAtTime(muted ? 0 : MASTER_VOLUME, audioContext.currentTime, 0.02);
-    return muted;
-  }
-
-  return { unlock, update, play, toggleMute, onPlay(listener) { playListener = listener; }, get muted() { return muted; } };
+  return Synth.create({ volume: 0.5, effects, loops: { build: buildLoops, update: updateLoops } });
 })();

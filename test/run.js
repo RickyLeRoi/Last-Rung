@@ -841,6 +841,14 @@ test('build: HTML, CSS e JS minificati (niente commenti, indentazione né marcat
   return (page.length / 1024).toFixed(1) + ' KB';
 });
 
+test('engine: test unitari (Rng, hash, sprite, PNG, primitive Gfx)', () => {
+  const { tests: unitTests } = require('../engine/test/unit');
+  for (const entry of unitTests) {
+    try { entry.fn(); } catch (error) { throw new Error(entry.name + ': ' + error.message); }
+  }
+  return unitTests.length + ' test';
+});
+
 test('guardie statiche: Math.random, console.log e script elencati in index.html', () => {
   const { problems, filesScanned } = require('./guards').runGuards();
   assert(!problems.length, problems.length + ' violazioni:\n       ' + problems.slice(0, 6).join('\n       '));

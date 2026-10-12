@@ -68,13 +68,17 @@ package.json      solo dipendenze di build (terser)
 dist/             output della build, minificato; non versionato (ignorato da git), si genera con node build.js
 LICENSE           licenza MIT
 .github/workflows/pages.yml   build, test e pubblicazione di dist/web/ su GitHub Pages
+engine/           parti generiche, riusabili da altri giochi (in costruzione, vedi PLAN.md)
+  core/util.js    matematica, RNG deterministico
+  gfx/sprite.js   creazione e contorno degli sprite
+  gfx/gfx.js      canvas, primitive a pixel interi, font bitmap
+  audio/synth.js  sintesi WebAudio generica (effetti e loop forniti dal gioco)
+  tools/png.js    encoder PNG in scala di grigi (build e test)
 src/
   config.js       tutti i numeri del gioco (fisica, regole, carburante, punteggi)
-  util.js         matematica, RNG deterministico
   sprites.js      pixel art e hitbox
-  gfx.js          canvas, primitive a pixel interi, font bitmap
   state.js        stato della partita
-  audio.js        suoni sintetizzati con WebAudio
+  sfx.js          effetti e loop sonori del gioco
   input.js        tastiera, gamepad, touch
   water.js        onde e molle dell'acqua
   particles.js    particelle e detriti fisici
@@ -113,7 +117,7 @@ test/
 ```sh
 npm install                                     # una volta sola (terser)
 node build.js                                   # genera dist/last-rung.html e dist/web/, minificati
-node test/run.js                                # suite di test, 41 test, guardie statiche comprese (filtro opzionale: node test/run.js replay)
+node test/run.js                                # suite di test, 42 test, guardie e test unitari dell'engine compresi (filtro opzionale: node test/run.js replay)
 node test/golden.js                             # snapshot di stato, frame e Rng su 15 scenari (--update solo dopo una modifica voluta)
 node test/levels.js                             # livelli 1-16 e 20 sfide del giorno risolvibili (~2 minuti)
 NODE_PATH=$(npm root -g) node test/e2e/run.js   # collaudo nel browser (serve Playwright; filtro: node test/e2e/run.js touch; ~90 s)

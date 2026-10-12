@@ -2,7 +2,7 @@
 'use strict';
 const { check, openWithClock, enterPlay, hold, advance, advanceUntil } = require('./lib');
 
-// Names copied from EFFECTS in src/audio.js.
+// Names copied from effects in src/sfx.js.
 const EFFECT_NAMES = ['ui', 'hook', 'board', 'save', 'death', 'explode', 'damage', 'contact', 'splash', 'land', 'lowFuel', 'engineDie', 'refuel',
   'stabOn', 'stabOff', 'thunder', 'win', 'scream', 'slip', 'snag', 'throw', 'dump', 'hiss', 'fail'];
 

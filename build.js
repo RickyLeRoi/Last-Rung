@@ -6,8 +6,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-const zlib = require('zlib');
 const crypto = require('crypto');
+const { encodeGrayscalePng } = require('./engine/tools/png');
 
 let minifyScript;
 try {
@@ -21,7 +21,6 @@ const ROOT = __dirname;
 const DIST_DIR = path.join(ROOT, 'dist');
 const WEB_DIR = path.join(DIST_DIR, 'web');
 const SPRITE_WIDTH = 32;
-const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
 const PWA_HEAD_TAGS = '<link rel="manifest" href="manifest.webmanifest">' +
   '<meta name="apple-mobile-web-app-status-bar-style" content="black">' +
@@ -68,36 +67,6 @@ async function buildBundle(indexHtml) {
   const { code: minified } = await minifyScript(bundle, { compress: { passes: 2 }, mangle: true, format: { comments: false } });
   console.log('bundle: ' + sourcePaths.length + ' files, ' + kilobytes(bundle) + ' -> ' + kilobytes(minified));
   return { scriptBlock: scriptBlock[0], minified };
-}
-
-function encodeGrayscalePng(width, height, pixels) {
-  const crcTable = Array.from({ length: 256 }, (_, n) => {
-    let value = n;
-    for (let bit = 0; bit < 8; bit++) value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
-    return value >>> 0;
-  });
-  const crc32 = bytes => {
-    let crc = 0xffffffff;
-    for (const byte of bytes) crc = crcTable[(crc ^ byte) & 255] ^ (crc >>> 8);
-    return (crc ^ 0xffffffff) >>> 0;
-  };
-  const chunk = (type, data) => {
-    const length = Buffer.alloc(4);
-    length.writeUInt32BE(data.length);
-    const typedData = Buffer.concat([Buffer.from(type), data]);
-    const checksum = Buffer.alloc(4);
-    checksum.writeUInt32BE(crc32(typedData));
-    return Buffer.concat([length, typedData, checksum]);
-  };
-  const scanlines = Buffer.alloc((width + 1) * height);
-  for (let row = 0; row < height; row++) {
-    for (let column = 0; column < width; column++) scanlines[row * (width + 1) + 1 + column] = pixels[row * width + column];
-  }
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(width, 0);
-  header.writeUInt32BE(height, 4);
-  header[8] = 8;
-  return Buffer.concat([PNG_SIGNATURE, chunk('IHDR', header), chunk('IDAT', zlib.deflateSync(scanlines)), chunk('IEND', Buffer.alloc(0))]);
 }
 
 // Icon: the heli sprite (read from sprites.js) with rotor blades and ladder, white on black.

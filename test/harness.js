@@ -1,8 +1,8 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const zlib = require('zlib');
 const crypto = require('crypto');
+const { encodeGrayscalePng } = require('../engine/tools/png');
 
 const DIST = path.join(__dirname, '..', 'dist', 'last-rung.html');
 const W = 384, H = 216;
@@ -12,20 +12,10 @@ function loadSource() {
   return html.match(/<script>([\s\S]*)<\/script>/)[1];
 }
 
-const CRC = [];
-for (let tableIndex = 0; tableIndex < 256; tableIndex++) { let remainder = tableIndex; for (let bitIndex = 0; bitIndex < 8; bitIndex++) remainder = remainder & 1 ? 0xedb88320 ^ (remainder >>> 1) : remainder >>> 1; CRC[tableIndex] = remainder >>> 0; }
-const crc = bytes => { let checksum = 0xffffffff; for (const byteValue of bytes) checksum = CRC[(checksum ^ byteValue) & 255] ^ (checksum >>> 8); return (checksum ^ 0xffffffff) >>> 0; };
 function writePng(pixelBuffer, file, scale = 3) {
-  const pngWidth = W * scale, pngHeight = H * scale, rawScanlines = Buffer.alloc((pngWidth + 1) * pngHeight);
-  for (let y = 0; y < pngHeight; y++) for (let x = 0; x < pngWidth; x++) rawScanlines[y * (pngWidth + 1) + 1 + x] = pixelBuffer[((y / scale) | 0) * W + ((x / scale) | 0)];
-  const chunk = (chunkType, chunkData) => {
-    const lengthField = Buffer.alloc(4); lengthField.writeUInt32BE(chunkData.length);
-    const typeAndData = Buffer.concat([Buffer.from(chunkType), chunkData]);
-    const crcField = Buffer.alloc(4); crcField.writeUInt32BE(crc(typeAndData));
-    return Buffer.concat([lengthField, typeAndData, crcField]);
-  };
-  const headerData = Buffer.alloc(13); headerData.writeUInt32BE(pngWidth, 0); headerData.writeUInt32BE(pngHeight, 4); headerData[8] = 8; headerData[9] = 0;
-  fs.writeFileSync(file, Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', headerData), chunk('IDAT', zlib.deflateSync(rawScanlines)), chunk('IEND', Buffer.alloc(0))]));
+  const pngWidth = W * scale, pngHeight = H * scale, rawPixels = Buffer.alloc(pngWidth * pngHeight);
+  for (let y = 0; y < pngHeight; y++) for (let x = 0; x < pngWidth; x++) rawPixels[y * pngWidth + x] = pixelBuffer[((y / scale) | 0) * W + ((x / scale) | 0)];
+  fs.writeFileSync(file, encodeGrayscalePng(pngWidth, pngHeight, rawPixels));
 }
 
 

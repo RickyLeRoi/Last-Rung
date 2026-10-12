@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const MATH_RANDOM_ALLOWED = ['src/render.js', 'src/audio.js'];
+const MATH_RANDOM_ALLOWED = ['src/render.js', 'engine/audio/synth.js'];
 
 // Pages and the folders whose .js files must be listed in their build:js block. Extended as engine/ and games/ appear.
 function findPages() {

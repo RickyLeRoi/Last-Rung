@@ -1,3 +1,4 @@
+// engine/gfx/gfx.js
 'use strict';
 // Only #fff and #000 (plus blood red) and integer coordinates: no antialiasing, hence no greys.
 const Gfx = (() => {
