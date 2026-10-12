@@ -8,40 +8,13 @@ function fireRect(fire) {
   return { x: minX, y: fire.y - flameHeight, w: maxX - minX, h: flameHeight };
 }
 
-function makeBolt() {
-  const segments = [];
-  let x = game.camX + randomRange(30, CONFIG.W - 30), y = 12, branch = null;
-  for (;;) {
-    const nextX = x + randomRange(-7, 7);
-    let nextY = y + randomRange(5, 11), reachedEnd = false;
-    const surfaceY = waterSurfaceY(nextX);
-    if (surfaceY !== Infinity && nextY >= surfaceY) { nextY = surfaceY; reachedEnd = true; }
-    if (nextY >= CONFIG.H) { nextY = CONFIG.H; reachedEnd = true; }
-    segments.push([x, y, nextX, nextY]);
-    if (!branch && y > 40 && chance(0.5)) branch = [x, y];
-    x = nextX; y = nextY;
-    if (reachedEnd) break;
-  }
-  if (branch) {
-    let [branchX, branchY] = branch;
-    for (let i = 0; i < 4; i++) {
-      const nextX = branchX + randomRange(2, 9) * (chance(0.5) ? -1 : 1), nextY = branchY + randomRange(4, 9);
-      segments.push([branchX, branchY, nextX, nextY]);
-      branchX = nextX; branchY = nextY;
-    }
-  }
-  return { segs: segments, end: [x, y] };
-}
-
 function initRain() {
-  game.rain = [];
-  const dropCount = Math.floor(game.L.rain * 170);
-  for (let i = 0; i < dropCount; i++) game.rain.push({ x: randomRange(0, CONFIG.W), y: randomRange(0, CONFIG.H), s: randomRange(0, 2) });
+  game.rain = Weather.initRain(Math.floor(game.L.rain * 170), CONFIG.W, CONFIG.H);
 }
 
 function updateEnv() {
   const level = game.L, time = game.time, screenWidth = CONFIG.W, screenHeight = CONFIG.H;
-  game.wind = level.wind ? level.wind * (0.55 * Math.sin(time * 0.35) + 0.3 * Math.sin(time * 1.37 + 2) + 0.15 * Math.sin(time * 3.1)) : 0;
+  game.wind = Weather.wind(level.wind, time);
   for (const solid of level.solids) if (solid.dyn) solid.y = waterSurfaceY(solid.x + solid.w / 2) - 2;
   for (const decorItem of level.decor) {
     if (!decorItem.dr) continue;
@@ -66,34 +39,20 @@ function updateEnv() {
     }
     if (chance(0.05 + fire.press * 0.1)) addParticle({ t: 'smoke', x: fire.x + fire.w / 2, y: flameRect.y, r: 2, life: Math.floor(randomRange(80, 130)), vx: side * fire.press * 0.6 });
   }
-  for (const raindrop of game.rain) {
-    raindrop.y += 4 + raindrop.s;
-    raindrop.x += game.wind * 1.5 + 0.5;
-    const waterY = waterSurfaceY(raindrop.x + game.camX);
-    if (raindrop.y > waterY || raindrop.y > screenHeight) {
-      if (waterY !== Infinity && raindrop.y > waterY && chance(0.15)) addParticle({ t: 'px', x: raindrop.x + game.camX, y: waterY - 1, vx: randomRange(-0.4, 0.4), vy: -randomRange(0.3, 0.8), g: 0.08, life: 10 });
-      raindrop.y = randomRange(-10, 10); raindrop.x = randomRange(-30, screenWidth + 30);
-    }
-    if (raindrop.x > screenWidth + 30) raindrop.x -= screenWidth + 60;
-    if (raindrop.x < -30) raindrop.x += screenWidth + 60;
-  }
+  Weather.updateRain(game.rain, {
+    wind: game.wind, camX: game.camX, width: screenWidth, height: screenHeight, waterY: waterSurfaceY,
+    onHitWater: (x, waterY) => addParticle({ t: 'px', x, y: waterY - 1, vx: randomRange(-0.4, 0.4), vy: -randomRange(0.3, 0.8), g: 0.08, life: 10 }),
+  });
   if (level.lightning) {
-    if (game.boltT > 0) game.boltT--;
-    if (game.flashT > 0) game.flashT--;
-    if (--game.lightningT <= 0) {
-      game.lightningT = Math.floor(randomRange(260, 600));
-      game.bolt = makeBolt();
-      game.boltT = 10; game.flashT = 3;
-      splash(game.bolt.end[0], 3);
-      Sfx.play('thunder');
-    }
+    Weather.tickLightning(game, {
+      camX: game.camX, width: screenWidth, height: screenHeight, waterY: waterSurfaceY,
+      onStrike: bolt => { splash(bolt.end[0], 3); Sfx.play('thunder'); },
+    });
   }
 }
 
 function updateCamera() {
   const heli = game.heli;
-  const target = clamp(heli.x + 16 - CONFIG.W / 2 + heli.vx * 28, 0, game.L.worldW - CONFIG.W);
-  game.camX += (target - game.camX) * 0.08;
-  game.shake *= 0.88;
-  if (game.shake < 0.3) game.shake = 0;
+  game.camX = Camera.follow(game.camX, heli.x + 16 - CONFIG.W / 2 + heli.vx * 28, game.L.worldW, CONFIG.W, 0.08);
+  game.shake = Camera.decayShake(game.shake);
 }

@@ -70,6 +70,8 @@ LICENSE           licenza MIT
 .github/workflows/pages.yml   build, test e pubblicazione di dist/web/ su GitHub Pages
 engine/           parti generiche, riusabili da altri giochi (in costruzione, vedi PLAN.md)
   core/util.js    matematica, RNG deterministico
+  core/geometry.js  Bresenham e riquadri dei pericoli
+  world/          acqua a molle, particelle, meteo (vento, pioggia, fulmini), camera
   gfx/sprite.js   creazione e contorno degli sprite
   gfx/gfx.js      canvas, primitive a pixel interi, font bitmap
   audio/synth.js  sintesi WebAudio generica (effetti e loop forniti dal gioco)

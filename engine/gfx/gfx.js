@@ -61,16 +61,7 @@ const Gfx = (() => {
   }
   // dot = dashed line
   function drawLine(startX, startY, endX, endY, dot) {
-    startX = round(startX); startY = round(startY); endX = round(endX); endY = round(endY);
-    const deltaX = Math.abs(endX - startX), stepX = startX < endX ? 1 : -1, deltaY = -Math.abs(endY - startY), stepY = startY < endY ? 1 : -1;
-    let error = deltaX + deltaY, i = 0;
-    for (;;) {
-      if (!dot || (i++ & 1) === 0) canvasContext.fillRect(startX, startY, 1, 1);
-      if (startX === endX && startY === endY) break;
-      const doubleError = 2 * error;
-      if (doubleError >= deltaY) { error += deltaY; startX += stepX; }
-      if (doubleError <= deltaX) { error += deltaX; startY += stepY; }
-    }
+    bresenham(startX, startY, endX, endY, (x, y, index) => { if (!dot || (index & 1) === 0) canvasContext.fillRect(x, y, 1, 1); });
   }
   function drawCircle(centerX, centerY, radius, dot) {
     centerX = round(centerX); centerY = round(centerY); radius = round(radius);

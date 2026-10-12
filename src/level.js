@@ -19,26 +19,9 @@ function dailySpec(date) {
 }
 const tutorialSpec = () => ({ n: 0, tutorial: true, scenario: 2, loop: 0, seed: 777 });
 
-function withBounds(hazard) {
-  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
-  for (let i = 0; i < hazard.pts.length; i += 2) {
-    minX = Math.min(minX, hazard.pts[i]); maxX = Math.max(maxX, hazard.pts[i]);
-    minY = Math.min(minY, hazard.pts[i + 1]); maxY = Math.max(maxY, hazard.pts[i + 1]);
-  }
-  return Object.assign(hazard, { x0: minX, x1: maxX, y0: minY, y1: maxY });
-}
 function lineHazard(startX, startY, endX, endY) {
-  startX = round(startX); startY = round(startY); endX = round(endX); endY = round(endY);
   const points = [];
-  const deltaX = Math.abs(endX - startX), stepX = startX < endX ? 1 : -1, deltaY = -Math.abs(endY - startY), stepY = startY < endY ? 1 : -1;
-  let error = deltaX + deltaY, x = startX, y = startY;
-  for (;;) {
-    points.push(x, y);
-    if (x === endX && y === endY) break;
-    const doubleError = 2 * error;
-    if (doubleError >= deltaY) { error += deltaY; x += stepX; }
-    if (doubleError <= deltaX) { error += deltaX; y += stepY; }
-  }
+  bresenham(startX, startY, endX, endY, (x, y) => points.push(x, y));
   return withBounds({ pts: points });
 }
 function cableHazard(startX, startY, endX, endY, sag) {

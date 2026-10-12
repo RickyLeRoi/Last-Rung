@@ -57,9 +57,21 @@ test('encodeGrayscalePng: firma, IHDR e pixel', () => {
   assertEqual([...scanlines], [0, 0, 128, 255, 0, 255, 128, 0], 'scanline con byte di filtro');
 });
 
+test('geometry: bresenham visita gli estremi e withBounds calcola il riquadro', () => {
+  const { bresenham, withBounds } = loadScripts(['engine/core/geometry.js'], ['bresenham', 'withBounds']);
+  const visited = [];
+  bresenham(0, 0, 3, 1, (x, y, index) => visited.push([x, y, index]));
+  assertEqual(visited, [[0, 0, 0], [1, 0, 1], [2, 1, 2], [3, 1, 3]], 'punti');
+  const reversed = [];
+  bresenham(3.4, 1, 0, 0, (x, y) => reversed.push([x, y]));
+  assertEqual([reversed[0], reversed[reversed.length - 1]], [[3, 1], [0, 0]], 'estremi arrotondati');
+  const bounded = withBounds({ pts: [4, 9, 2, 7, 6, 8] });
+  assertEqual([bounded.x0, bounded.x1, bounded.y0, bounded.y1], [2, 6, 7, 9], 'riquadro');
+});
+
 function loadGfx() {
   const dom = fakeDom();
-  const { Gfx } = loadScripts(['engine/core/util.js', 'engine/gfx/gfx.js'], ['Gfx'], { document: dom.document, window: dom.window, CONFIG: { W: 384, H: 216 } });
+  const { Gfx } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js'], ['Gfx'], { document: dom.document, window: dom.window, CONFIG: { W: 384, H: 216 } });
   dom.fills.length = 0;   // drop the pattern tiles Gfx paints while loading
   const pixels = () => new Set(dom.fills.filter(fill => fill.w === 1 && fill.h === 1).map(fill => fill.x + ',' + fill.y));
   return { Gfx, dom, pixels };
