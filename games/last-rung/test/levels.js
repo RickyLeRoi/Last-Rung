@@ -4,10 +4,10 @@
  * Solvability check: for every person in levels 1-16 and 20 daily challenges, an autopilot restarts
  * from scratch and tries to rescue them (ladder hook, landing, or winch rescuer), then compares the
  * rescue frame against the person's time limit.
- *   node test/levels.js      (everything)
- *   node test/levels.js 7    (level 7 only)
+ *   node games/last-rung/test/levels.js      (everything)
+ *   node games/last-rung/test/levels.js 7    (level 7 only)
  */
-const { boot } = require('./harness');
+const { boot } = require('./helpers');
 const { rescueOne } = require('./autopilot');
 
 const onlyLevel = process.argv[2] ? +process.argv[2] : 0;

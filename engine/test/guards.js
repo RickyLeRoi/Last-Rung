@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// test/guards.js
+// engine/test/guards.js
 'use strict';
 /*
  * Static guards on the sources (no game is run):
@@ -7,19 +7,21 @@
  *   - no console.log in the game
  *   - engine/ never mentions the game (game., heli, SPRITES, Sfx, the debug global) and reads only the CONFIG keys of the contract
  *   - every source file is listed in the build:js block of its index.html, and every listed file exists
- * Run by test/run.js (so CI executes it) or on its own: node test/guards.js
+ * Run by engine/test/all.js (npm test, so CI executes it) or on its own: node engine/test/guards.js
  */
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const ENGINE_FORBIDDEN = [[/\bgame\s*\./, 'game.'], [/\bheli\b/, 'heli'], [/\bSPRITES\b/, 'SPRITES'], [/\bSfx\b/, 'Sfx'], [/\b__eli\b/, '__eli']];
 const ENGINE_CONFIG_KEYS = ['W', 'H', 'input', 'maxParticles', 'touchGutter'];
-const MATH_RANDOM_ALLOWED = ['src/render.js', 'engine/audio/synth.js'];
+// Rendering and audio never feed the simulation, so they may use Math.random.
+const MATH_RANDOM_ALLOWED = [/^games\/[^/]+\/src\/render\.js$/, /^engine\/audio\/synth\.js$/];
+const isMathRandomAllowed = file => MATH_RANDOM_ALLOWED.some(pattern => pattern.test(file));
 
-// Pages and the folders whose .js files must be listed in their build:js block. Extended as engine/ and games/ appear.
+// Pages and the folders whose .js files must be listed in their build:js block: one page per game.
 function findPages() {
-  const pages = [{ html: 'index.html', sourceRoots: ['src', 'engine/core', 'engine/gfx', 'engine/audio', 'engine/input', 'engine/world'] }];
+  const pages = [];
   const gamesDirectory = path.join(ROOT, 'games');
   if (fs.existsSync(gamesDirectory)) {
     for (const game of fs.readdirSync(gamesDirectory)) {
@@ -83,7 +85,7 @@ function scanForbiddenCalls(file, problems) {
   if (file.startsWith('engine/')) scanEngineCoupling(file, source, problems);
   const lines = source.split('\n');
   lines.forEach((line, i) => {
-    if (/\bMath\s*\.\s*random\b/.test(line) && !MATH_RANDOM_ALLOWED.includes(file)) problems.push(file + ':' + (i + 1) + ': Math.random fuori da ' + MATH_RANDOM_ALLOWED.join(', ') + ' (la simulazione usa Rng)');
+    if (/\bMath\s*\.\s*random\b/.test(line) && !isMathRandomAllowed(file)) problems.push(file + ':' + (i + 1) + ': Math.random fuori da games/*/src/render.js ed engine/audio/synth.js (la simulazione usa Rng)');
     if (/\bconsole\s*\.\s*log\b/.test(line)) problems.push(file + ':' + (i + 1) + ': console.log nel gioco');
   });
 }

@@ -83,9 +83,9 @@ module.exports = async (browser, ctx) => {
     await verify(page, 'pausa');
     await page.keyboard.press('KeyP');
     await advance(page, 3);
-    await page.evaluate(() => { const game = window.__eli.game; game.state = 'over'; game.overT = 0; game.overReason = 'PROVA'; });
+    await page.evaluate(() => { const game = window.__debug.game; game.state = 'over'; game.overT = 0; game.overReason = 'PROVA'; });
     await verify(page, 'game over');
-    await page.evaluate(() => { const game = window.__eli.game; game.state = 'done'; game.result = 'win'; game.stars = 2; game.bonus = 0; });
+    await page.evaluate(() => { const game = window.__debug.game; game.state = 'done'; game.result = 'win'; game.stars = 2; game.bonus = 0; });
     await verify(page, 'missione compiuta');
     await context.close();
   }

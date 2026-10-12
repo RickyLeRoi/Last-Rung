@@ -59,7 +59,19 @@ L'engine quantizza a 0,01 **tutti** gli assi restituiti da `axes()` (`padActive`
 Opzioni (dettaglio nel commento in testa a `core/flow.js`): `run` (oggetto stato del gioco), `audio` (`toggleMute`, `play`), `idleInput`, `codec`, `message`, `newRun`, `step`, `checkEnd`, `stepInput`, `beforeState`, `afterStep`, `specs: { first, daily, next }`, `introFrames`, `debug`, `testHook`. Restituisce `{ step, startRun, restart, startReplay }`; `Loop.start(flow.step, render)` fa partire il gioco.
 Sull'oggetto `run` l'engine legge e scrive: `state`, `introT`, `overT`, `overReason`, `rec`, `replay`, `spec`, `score`, `levelStartScore`, `result`, `softFlash`.
 
+## Un gioco nel repository
+
+Un gioco e' `games/<id>/` con:
+
+- `game.json`: `id`, `title`, `shortName`, `lang`, `description`, `icon` (`file` e `sprite` da cui la build legge le righe dello sprite, `extraRows`, `rotorRow`) e `debugGlobal` (nome del globale esposto con `?debug`, usato dalle suite E2E come `window.__debug`).
+- `index.html`: pagina di sviluppo; il blocco `<!-- build:js --> ... <!-- /build:js -->` elenca gli script **relativi alla pagina** (`../../engine/...` e `src/...`), nell'ordine di caricamento.
+- `src/` e, per i test, `test/`.
+
+`node engine/tools/build.js [id...]` costruisce `dist/<id>.html`, `dist/site/<id>/` (PWA con scope nella cartella del gioco, cache `<id>-<hash>`) e l'hub `dist/site/index.html` generato dai `game.json`.
+
 ## Test
 
-- `engine/test/unit.js`: test unitari (girano dentro `node test/run.js`), con il caricatore a sandbox `engine/test/load.js`.
-- Golden e E2E dei giochi: vedi il README principale. Nessun golden deve cambiare quando si modifica l'engine "senza cambiare il comportamento".
+- `engine/test/unit.js`: test unitari (sandbox `engine/test/load.js`); `engine/test/guards.js`: guardie statiche (niente `Math.random` nella simulazione, script elencati, engine non accoppiato al gioco).
+- `engine/test/conformance.js`: suite che **ogni** gioco deve passare, sul bundle in `dist/`: avvio dal titolo con test hook completo (`game`, `CONFIG`, `startLevel`, `startReplay`, `Rng`, `Input`), flusso confirm/pausa/restart, 3000 frame di input casuali presi dai bindings del gioco (solo interi, solo `#fff/#000/#d00`), replay deterministico. Per gli hash di stato un gioco puo' fornire `games/<id>/test/snapshot.js`.
+- `engine/test/e2e/`: suite nel browser generiche (`devpage`, `layout`, `pwa`, `golden`, `hub`), lanciate con `--game <id>`; il `golden` legge scenari e baseline da `games/<id>/test/`. Le suite specifiche stanno in `games/<id>/test/e2e/`.
+- `npm test` (`engine/test/all.js`) esegue unit, guardie, conformance e, per ogni gioco, `test/run.js` e `test/golden.js`.

@@ -27,12 +27,12 @@ module.exports = async (browser, ctx) => {
   await page.evaluate(() => { window.__pad.axes = [0, 0, 0, 1]; });
   await page.waitForTimeout(500);
   await page.evaluate(() => { window.__pad.axes = [0, 0, 0, 0]; });
-  const winchLength = await page.evaluate(() => window.__eli.game.heli.winch);
+  const winchLength = await page.evaluate(() => window.__debug.game.heli.winch);
   check(winchLength > 10, 'gamepad: levetta destra in giù cala la scaletta (' + winchLength.toFixed(1) + ' px)');
   await press(3);
-  const levelInfo = await page.evaluate(() => ({ t: window.__eli.game.L.tutorial, n: window.__eli.game.L.n }));
+  const levelInfo = await page.evaluate(() => ({ t: window.__debug.game.L.tutorial, n: window.__debug.game.L.n }));
   check(!levelInfo.t && levelInfo.n === 1, "gamepad: Y salta l'addestramento");
-  await page.evaluate(() => window.__eli.Sfx.play('explode'));
+  await page.evaluate(() => window.__debug.Sfx.play('explode'));
   const rumbleEvents = await page.evaluate(() => window.__rumble);
   check(rumbleEvents.length > 0 && /dual-rumble/.test(rumbleEvents[0]), 'gamepad: vibrazione (' + rumbleEvents.join(',') + ')');
   await page.close();

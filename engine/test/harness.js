@@ -2,13 +2,14 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { encodeGrayscalePng } = require('../engine/tools/png');
+const { encodeGrayscalePng } = require('../tools/png');
 
-const DIST = path.join(__dirname, '..', 'dist', 'last-rung.html');
+const ROOT = path.join(__dirname, '..', '..');
 const W = 384, H = 216;
 
-function loadSource() {
-  const html = fs.readFileSync(DIST, 'utf8');
+// Reads the built single-file game dist/<id>.html (node engine/tools/build.js <id>).
+function loadSource(gameId) {
+  const html = fs.readFileSync(path.join(ROOT, 'dist', gameId + '.html'), 'utf8');
   return html.match(/<script>([\s\S]*)<\/script>/)[1];
 }
 
@@ -50,8 +51,18 @@ function encodeStable(value, knownObjects, path = []) {
 }
 const sha1 = bytes => crypto.createHash('sha1').update(bytes).digest('hex');
 
+// A game may describe its simulation for stateHash() in games/<id>/test/snapshot.js, which exports
+// (hook, encodeStable) => plain object without the flow state (the harness adds it).
+function loadSnapshotFunction(gameId) {
+  const file = path.join(ROOT, 'games', gameId, 'test', 'snapshot.js');
+  return fs.existsSync(file) ? require(file) : null;
+}
+
+// options: { game (id, default 'last-rung'), seededMath, search, gamepad }
 function boot(options = {}) {
-  const source = loadSource();
+  const gameId = options.game || 'last-rung';
+  const source = loadSource(gameId);
+  const takeSnapshot = loadSnapshotFunction(gameId);
   const seededMath = options.seededMath === undefined ? null : seededRandom(options.seededMath);
   const pixelBuffer = new Uint8Array(W * H);
   const stats = { nonInt: 0, badColor: 0 };
@@ -122,20 +133,8 @@ function boot(options = {}) {
       return sha1(pixelBuffer);
     },
     stateHash(options = {}) {
-      const game = hook.game, level = game.L, knownObjects = new Map();
-      level.solids.forEach((solid, i) => knownObjects.set(solid, 'solid:' + i));
-      level.people.forEach((person, i) => knownObjects.set(person, 'person:' + i));
-      level.fires.forEach((fire, i) => knownObjects.set(fire, 'fire:' + i));
-      const personFields = ['state', 'x', 'y', 'vx', 'vy', 'kind', 'injured', 't'];
-      const snapshot = {
-        heli: encodeStable(game.heli, knownObjects),
-        people: level.people.map(person => encodeStable(Object.fromEntries(personFields.map(field => [field, person[field]])), knownObjects)),
-        saved: level.saved, dead: level.dead, total: level.total, killedByPlayer: level.killedByPlayer,
-        score: game.score, particles: game.parts.length, wind: encodeStable(game.wind, knownObjects), camX: encodeStable(game.camX, knownObjects),
-        fires: level.fires.map(fire => encodeStable({ hp: fire.hp, press: fire.press }, knownObjects)),
-        frame: game.frame,
-      };
-      if (!options.ignoreState) snapshot.state = game.state;
+      const snapshot = takeSnapshot ? takeSnapshot(hook, encodeStable) : { frame: hook.game.frame };
+      if (!options.ignoreState) snapshot.state = hook.game.state;
       return sha1(JSON.stringify(snapshot));
     },
     // Consumes one number: call it last in a scenario. A changed order of Rng calls shows up here even when the state looks equal.
@@ -147,24 +146,6 @@ function boot(options = {}) {
   return driver;
 }
 
-function flyTo(driver, targetX, targetY, maxSpeed, tolerance = 2) {
-  const heli = driver.game.heli, heliCenterX = heli.x + 16, heliBottomY = heli.y + 16;
-  const desiredVelocityX = Math.max(-maxSpeed, Math.min(maxSpeed, (targetX - heliCenterX) * 0.04));
-  const desiredVelocityY = Math.max(-maxSpeed * 0.8, Math.min(maxSpeed * 0.8, (targetY - heliBottomY) * 0.04));
-  const pressedKeys = [];
-  if (heli.vx < desiredVelocityX - 0.03) pressedKeys.push('ArrowRight'); else if (heli.vx > desiredVelocityX + 0.03) pressedKeys.push('ArrowLeft');
-  if (heli.vy > desiredVelocityY - 0.02) pressedKeys.push('ArrowUp');
-  driver.set(pressedKeys); driver.tick();
-  return Math.abs(targetX - heliCenterX) < tolerance && Math.abs(targetY - heliBottomY) < 3;
-}
-function goTo(driver, getTargetX, getTargetY, maxSpeed, limit = 3000) {
-  for (let i = 0; i < limit; i++) {
-    if (driver.game.heli.state !== 'fly' || driver.game.state !== 'play') return false;
-    if (flyTo(driver, getTargetX(), getTargetY(), maxSpeed)) return true;
-  }
-  return false;
-}
-
 const randomKeysPolicy = seed => frame => {
   const scrambled = Math.sin((frame + seed) * 12.9898) * 43758.5453, fraction = scrambled - Math.floor(scrambled);
   const keys = [];
@@ -172,15 +153,4 @@ const randomKeysPolicy = seed => frame => {
   if ((fraction * 7) % 1 < 0.3) keys.push('ArrowLeft'); else if ((fraction * 13) % 1 < 0.4) keys.push('ArrowRight');
   return keys;
 };
-function place(harness, x, y, velocityX = 0, velocityY = 0) {
-  const heli = harness.game.heli;
-  heli.ground = null; heli.x = x; heli.y = y; heli.px = x; heli.py = y; heli.vx = velocityX; heli.vy = velocityY;
-}
-function roofWithoutObstacles(game) {
-  const level = game.L;
-  return level.solids.find(solid => solid.kind === 'bld' && !solid.safe && solid.w >= 50 &&
-    !level.fires.some(fire => fire.x < solid.x + solid.w && fire.x + fire.w > solid.x) &&
-    !level.haz.some(hazard => hazard.x1 >= solid.x - 4 && hazard.x0 <= solid.x + solid.w + 4 && hazard.y1 < solid.y + 2 && hazard.y0 < solid.y));
-}
-
-module.exports = { boot, flyTo, goTo, randomKeysPolicy, place, roofWithoutObstacles, W, H };
+module.exports = { boot, randomKeysPolicy, encodeStable, sha1, W, H };

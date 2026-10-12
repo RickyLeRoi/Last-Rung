@@ -22,7 +22,8 @@
  *   specs: { first(), daily(date), next(run) -> { spec, score, title } },
  *   introFrames,
  *   debug: { name, expose },   exposed as window[name] when the URL has ?debug
- *   testHook,                  handed to __TEST_HOOK__ when the test harness defines it
+ *   testHook,                  handed to __TEST_HOOK__ (together with Input) when the test harness defines it; it must contain at least
+ *                              game, CONFIG, startLevel, startReplay, Rng
  * })
  * Returns { step, startRun, restart, startReplay }.
  */
@@ -123,7 +124,7 @@ const Flow = {
     }
 
     if (debug && new URLSearchParams(location.search).has('debug')) window[debug.name] = debug.expose;
-    if (typeof __TEST_HOOK__ === 'function' && testHook) __TEST_HOOK__(testHook);
+    if (typeof __TEST_HOOK__ === 'function' && testHook) __TEST_HOOK__({ Input, ...testHook });
     return { step: stepFrame, startRun, restart, startReplay };
   },
 };

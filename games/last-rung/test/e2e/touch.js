@@ -39,7 +39,7 @@ module.exports = async (browser, ctx) => {
   await touch('touchStart', winchDownBox.x + winchDownBox.width / 2, winchDownBox.y + winchDownBox.height / 2);
   await page.waitForTimeout(600);
   await touch('touchEnd');
-  const ladderLength = await page.evaluate(() => window.__eli.game.heli.winch);
+  const ladderLength = await page.evaluate(() => window.__debug.game.heli.winch);
   check(ladderLength > 10, 'telefono: tenendo premuto ▼ la scaletta si allunga (' + ladderLength.toFixed(1) + ' px)');
   const skip = await page.$('button[data-edge="skip"]');
   const isSkipVisible = skip && await skip.isVisible();
@@ -51,13 +51,13 @@ module.exports = async (browser, ctx) => {
   check(gear.buoy && !gear.bucket, 'telefono: pulsante SALVAGENTE visibile, SECCHIO solo negli incendi');
   const buoyBox = await (await page.$('button[data-edge="buoy"]')).boundingBox();
   await page.touchscreen.tap(buoyBox.x + buoyBox.width / 2, buoyBox.y + buoyBox.height / 2); await page.waitForTimeout(120);
-  const buoysLeft = await page.evaluate(() => window.__eli.game.heli.buoys);
+  const buoysLeft = await page.evaluate(() => window.__debug.game.heli.buoys);
   check(buoysLeft === 2, 'telefono: SALVAGENTE lancia un salvagente (' + buoysLeft + ' rimasti)');
-  await page.evaluate(() => window.__eli.Sfx.play('damage'));
+  await page.evaluate(() => window.__debug.Sfx.play('damage'));
   const vibrations = await page.evaluate(() => window.__vib);
   check(vibrations.length > 0, 'telefono: vibrazione sui danni (' + vibrations.join(',') + ' ms)');
   if (isSkipVisible) { const skipBox = await skip.boundingBox(); await page.touchscreen.tap(skipBox.x + skipBox.width / 2, skipBox.y + skipBox.height / 2); await page.waitForTimeout(150); }
-  const levelInfo = await page.evaluate(() => ({ t: window.__eli.game.L.tutorial, n: window.__eli.game.L.n }));
+  const levelInfo = await page.evaluate(() => ({ t: window.__debug.game.L.tutorial, n: window.__debug.game.L.n }));
   check(!levelInfo.t && levelInfo.n === 1, "telefono: SALTA porta al livello 1");
   check(errors.length === 0, 'telefono: nessun errore JavaScript' + (errors.length ? ': ' + errors.join(' | ') : ''));
   await browserContext.close();

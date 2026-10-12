@@ -3,9 +3,9 @@
 const fs = require('fs');
 const os = require('os');   // 20260930 ** RG #windows_devnull: '/dev/null' does not exist on Windows
 const path = require('path');
-const { boot, flyTo, goTo, randomKeysPolicy, place, roofWithoutObstacles } = require('./harness');
+const { boot, flyTo, goTo, randomKeysPolicy, place, roofWithoutObstacles } = require('./helpers');
 
-const SHOTS = path.join(__dirname, 'shots');
+const SHOTS = path.join(__dirname, '..', '..', '..', 'dist', 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 const shotPath = name => path.join(SHOTS, name + '.png');
 
@@ -832,27 +832,13 @@ test('screenshot: titolo, intro, missione compiuta, game over', () => {
 });
 
 test('build: HTML, CSS e JS minificati (niente commenti, indentazione né marcatori dei file)', () => {
-  const page = fs.readFileSync(path.join(__dirname, '..', 'dist', 'last-rung.html'), 'utf8');
+  const page = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'dist', 'last-rung.html'), 'utf8');
   const css = page.match(/<style>([\s\S]*?)<\/style>/)[1];
   assert(!page.includes('<!--'), 'commenti HTML rimasti');
   assert(!page.includes('// ====='), 'marcatori dei file rimasti nel bundle');
   assert(!css.includes('/*') && !css.includes('\n'), 'CSS non minificato');
   assert(page.split('\n').length <= 2, 'la pagina ha ' + page.split('\n').length + ' righe: HTML o JS non minificato');
   return (page.length / 1024).toFixed(1) + ' KB';
-});
-
-test('engine: test unitari (Rng, hash, sprite, PNG, primitive Gfx)', () => {
-  const { tests: unitTests } = require('../engine/test/unit');
-  for (const entry of unitTests) {
-    try { entry.fn(); } catch (error) { throw new Error(entry.name + ': ' + error.message); }
-  }
-  return unitTests.length + ' test';
-});
-
-test('guardie statiche: Math.random, console.log e script elencati in index.html', () => {
-  const { problems, filesScanned } = require('./guards').runGuards();
-  assert(!problems.length, problems.length + ' violazioni:\n       ' + problems.slice(0, 6).join('\n       '));
-  return filesScanned + ' file';
 });
 
 (async () => {

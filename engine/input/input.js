@@ -166,5 +166,5 @@ const Input = (() => {
     } catch (error) { /* haptics are optional */ }
   }
 
-  return { configure, sample, syncUI, rumble, get device() { return device; } };
+  return { configure, sample, syncUI, rumble, get device() { return device; }, get bindings() { return bindings; } };
 })();

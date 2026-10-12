@@ -1,0 +1,14 @@
+{
+  "id": "last-rung",
+  "title": "Last Rung",
+  "shortName": "Last Rung",
+  "lang": "it",
+  "description": "Soccorso in elicottero, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "heli",
+    "extraRows": ["..............#..#..............", "..............####.............."],
+    "rotorRow": true
+  },
+  "debugGlobal": "__eli"
+}

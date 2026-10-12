@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-// test/golden.js
+// games/last-rung/test/golden.js
 'use strict';
 /*
  * Golden snapshots: fixed scenarios with deterministic input (and a seeded Math.random for the renderer) are hashed every
  * 300 frames (simulation state + rendered frame) plus a final probe of the simulation RNG. Any refactor that changes
  * behaviour, pixels or the order of Rng calls makes this fail.
- *   node test/golden.js            compare every scenario with test/golden/last-rung.json
- *   node test/golden.js G04        only one scenario
- *   node test/golden.js --update   rewrite the baseline (only after an intentional change, with the user's approval)
+ *   node games/last-rung/test/golden.js            compare every scenario with games/last-rung/test/golden/last-rung.json
+ *   node games/last-rung/test/golden.js G04        only one scenario
+ *   node games/last-rung/test/golden.js --update   rewrite the baseline (only after an intentional change, with the user's approval)
  */
 const fs = require('fs');
 const path = require('path');
-const { boot, randomKeysPolicy, place, roofWithoutObstacles } = require('./harness');
+const { boot, randomKeysPolicy, place, roofWithoutObstacles } = require('./helpers');
 const { rescueOne } = require('./autopilot');
 const { SEA_ACTIONS: SEA_ACTION_DATA, SHARED_SCENARIOS } = require('./scenarios');
 
@@ -125,7 +125,7 @@ function execute(scenario) {
 }
 
 function describeDifference(id, expected, actual) {
-  if (!expected) return id + ': nessuna baseline (lancia node test/golden.js --update dopo aver verificato)';
+  if (!expected) return id + ': nessuna baseline (lancia node games/last-rung/test/golden.js --update dopo aver verificato)';
   const messages = [];
   const count = Math.max(expected.checkpoints.length, actual.checkpoints.length);
   for (let i = 0; i < count; i++) {

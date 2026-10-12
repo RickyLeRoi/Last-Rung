@@ -4,13 +4,18 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
-const ROOT = path.join(__dirname, '..', '..');
-const DEV_HTML = path.join(ROOT, 'index.html');
-const DIST_HTML = path.join(ROOT, 'dist', 'last-rung.html');
-const WEB_DIR = path.join(ROOT, 'dist', 'web');
+const ROOT = path.join(__dirname, '..', '..', '..');
+const argumentValue = name => { const index = process.argv.indexOf(name); return index >= 0 ? process.argv[index + 1] : null; };
+const GAME_ID = argumentValue('--game') || 'last-rung';
+const GAME_DIR = path.join(ROOT, 'games', GAME_ID);
+const GAME = JSON.parse(fs.readFileSync(path.join(GAME_DIR, 'game.json'), 'utf8'));
+const DEV_HTML = path.join(GAME_DIR, 'index.html');
+const DIST_HTML = path.join(ROOT, 'dist', GAME_ID + '.html');
+const SITE_DIR = path.join(ROOT, 'dist', 'site');
+const WEB_DIR = path.join(SITE_DIR, GAME_ID);
 const GAME_URL = 'file://' + DIST_HTML + '?debug';
 const DEV_URL = 'file://' + DEV_HTML + '?debug';
-const SHOTS = path.join(ROOT, 'test', 'shots');
+const SHOTS = path.join(ROOT, 'dist', 'shots');
 
 let fails = 0;
 let total = 0;
@@ -34,14 +39,14 @@ async function onlyBlackWhite(page) {
 // Two Enter presses within the same frame count as one, hence the retry loop.
 async function startPlay(page) {
   for (let i = 0; i < 6; i++) {
-    if (await page.evaluate(() => window.__eli.game.state) === 'play') return;
+    if (await page.evaluate(() => window.__debug.game.state) === 'play') return;
     await page.keyboard.press('Enter'); await page.waitForTimeout(60);
   }
 }
 
-const state = page => page.evaluate(() => { const game = window.__eli.game, heli = game.heli; return { st: game.state, x: heli.x, y: heli.y, vx: heli.vx, vy: heli.vy, stab: heli.stab, hs: heli.state }; });
+const state = page => page.evaluate(() => ({ st: window.__debug.game.state }));
 
-const waitForState = (page, name, timeout = 3000) => page.waitForFunction(expected => window.__eli.game.state === expected, name, { timeout });
+const waitForState = (page, name, timeout = 3000) => page.waitForFunction(expected => window.__debug.game.state === expected, name, { timeout });
 
 // Replaces performance.now and requestAnimationFrame so tests decide exactly how many 60 Hz steps run.
 // Must be installed with page.addInitScript before the game loads.
@@ -138,4 +143,4 @@ async function staticServer(webDirectory) {
   return { baseUrl: 'http://localhost:' + server.address().port + '/', close: () => server.close() };
 }
 
-module.exports = { DEV_HTML, DEV_URL, DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, waitForState, installManualClock, advance, advanceUntil, installSeededRandom, readGrayFrame, collectErrors, openWithClock, enterPlay, hold, staticServer };
+module.exports = { ROOT, GAME_ID, GAME_DIR, GAME, SITE_DIR, DEV_HTML, DEV_URL, DIST_HTML, WEB_DIR, GAME_URL, SHOTS, check, summary, onlyBlackWhite, startPlay, state, waitForState, installManualClock, advance, advanceUntil, installSeededRandom, readGrayFrame, collectErrors, openWithClock, enterPlay, hold, staticServer };

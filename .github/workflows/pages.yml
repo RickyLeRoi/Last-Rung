@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  e2e:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,24 +26,43 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
-      - name: Build
-        run: node build.js
+      - name: Build every game
+        run: npm run build
+      - name: Unit, guards, conformance, game suites and golden snapshots
+        run: npm test
+
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        game: [last-rung]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build every game
+        run: npm run build
       - name: Install Playwright
         run: |
           npm install -g playwright
           npx playwright install --with-deps chromium
       - name: E2E
-        run: NODE_PATH=$(npm root -g) node test/e2e/run.js
+        run: NODE_PATH=$(npm root -g) node engine/test/e2e/run.js --game ${{ matrix.game }}
       - name: Upload screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-shots
-          path: test/shots/
+          name: e2e-shots-${{ matrix.game }}
+          path: dist/shots/
           if-no-files-found: ignore
 
   deploy:
-    needs: e2e
+    needs: [test, e2e]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -56,15 +75,11 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
-      - name: Build
-        run: node build.js
-      - name: Test
-        run: node test/run.js
-      - name: Golden
-        run: node test/golden.js
+      - name: Build every game
+        run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/web
+          path: dist/site
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -37,7 +37,7 @@ module.exports = async (browser, ctx) => {
     await hold(page, 'ArrowUp', 30);
     await page.keyboard.press('KeyC'); await advance(page, 2);
     await page.evaluate(() => {
-      const game = window.__eli.game, heli = game.heli, fire = game.L.fires[0];
+      const game = window.__debug.game, heli = game.heli, fire = game.L.fires[0];
       heli.ground = null; heli.vx = heli.vy = 0; heli.x = heli.px = fire.x; heli.y = heli.py = fire.y - 70;
       heli.bucket.fill = 1;
       game.camX = Math.max(0, fire.x - 190);
@@ -51,8 +51,8 @@ module.exports = async (browser, ctx) => {
     const { page } = await openWithClock(browser, '&livello=1');
     await enterPlay(page);
     await hold(page, 'ArrowUp', 60);
-    await page.evaluate(() => { const heli = window.__eli.game.heli; heli.ground = null; heli.vy = 12; heli.vx = 4; });
-    const exploded = await page.evaluate(() => { const game = window.__eli.game; return window.__clock.until(() => game.heli.state === 'dead', 300); });
+    await page.evaluate(() => { const heli = window.__debug.game.heli; heli.ground = null; heli.vy = 12; heli.vx = 4; });
+    const exploded = await page.evaluate(() => { const game = window.__debug.game; return window.__clock.until(() => game.heli.state === 'dead', 300); });
     const result = await pixelsOutsidePalette(page, 12, 6);
     check(exploded >= 0, 'palette: l\'elicottero esplode nel test (' + exploded + ' frame)');
     report('esplosione e detriti', result);
@@ -61,7 +61,7 @@ module.exports = async (browser, ctx) => {
   {
     const { page } = await openWithClock(browser, '&livello=1');
     await enterPlay(page);
-    await page.evaluate(() => { const game = window.__eli.game; game.state = 'done'; game.result = 'win'; game.stars = 3; game.bonus = 500; });
+    await page.evaluate(() => { const game = window.__debug.game; game.state = 'done'; game.result = 'win'; game.stars = 3; game.bonus = 500; });
     report('pannello missione compiuta con le stelle', await pixelsOutsidePalette(page, 10, 8));
     await page.close();
   }

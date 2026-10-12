@@ -1,7 +1,7 @@
-// test/autopilot.js
+// games/last-rung/test/autopilot.js
 'use strict';
-// Scripted pilot shared by test/levels.js (solvability) and test/golden.js (G11).
-const { boot, flyTo, goTo } = require('./harness');
+// Scripted pilot shared by levels.js (solvability) and golden.js (G11).
+const { boot, flyTo, goTo } = require('./helpers');
 
 const CRUISE = 26;
 const placeHeli = (driver, x, y) => { const heli = driver.game.heli; heli.ground = null; heli.x = x; heli.y = y; heli.px = x; heli.py = y; heli.vx = heli.vy = 0; };

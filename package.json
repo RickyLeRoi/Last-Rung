@@ -1,12 +1,12 @@
 {
-  "name": "last-rung",
+  "name": "one-bit-games",
   "version": "1.0.0",
-  "description": "Helicopter rescue game, white-on-black pixel art. Vanilla HTML5 Canvas.",
+  "description": "One-bit pixel art games on a shared vanilla HTML5 Canvas engine.",
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "node build.js",
-    "test": "node test/run.js"
+    "build": "node engine/tools/build.js",
+    "test": "node engine/test/all.js"
   },
   "devDependencies": {
     "terser": "^5.51.2"
