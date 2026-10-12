@@ -1,7 +1,7 @@
 # Engine 1-bit
 
 Parti generiche estratte da Last Rung: un gioco le usa fornendo dati e hook, l'engine non conosce il gioco.
-Script classici (niente ES modules), ognuno definisce un namespace globale; il gioco si apre da `file://`.
+Per creare un gioco seguire anche le [linee guida](../GUIDELINES.md) (aspetto, CSS, nomi, test, processo). Script classici (niente ES modules), ognuno definisce un namespace globale; il gioco si apre da `file://`.
 
 ## Regole del contratto
 
@@ -28,7 +28,8 @@ Le dipendenze sono solo "a valle": `Lighting`, `UI` e `Input` usano `Gfx`; `Step
 | `core/flow.js` | `Flow.create({...})` | Macchina a stati `title/intro/play/pause/over/done/replay`, registrazione e replay, mute, lampi ridotti. Vedi sotto. |
 | `gfx/sprite.js` | `makeSprite(rows)`, `outlineSprite(sprite)` | Sprite da righe `'#.'`. |
 | `gfx/gfx.js` | `Gfx` | Canvas, adattamento allo schermo (`fit`), primitive, font bitmap, sprite (`drawSprite(sprite, x, y, flip, skew, skewFromRow = 4)`). |
-| `gfx/lighting.js` | `Lighting.darkness({ circles, cones, pattern })`, `Lighting.fog({ clear, lights, thin, dark, dither })` | Buio e nebbia calcolati per colonna. Il gioco costruisce le sorgenti (anche i raggi tremolanti: `Math.random` resta nel gioco). Lasciano `fillStyle = '#fff'`. |
+| `gfx/lighting.js` | `Lighting.darkness({ circles, cones, pattern })`, `Lighting.fog({ clear, lights, thin, dark, dither })`, `Lighting.fogBanks({ time, wind, clear })` | Buio e nebbia calcolati per colonna. Il gioco costruisce le sorgenti (anche i raggi tremolanti: `Math.random` resta nel gioco). Lasciano `fillStyle = '#fff'`. |
+| `gfx/sky.js` | `Sky.drawNight({ cameraX, covers, waterY, stars, moon, frame })` | Stelle e luna, disegnate solo dove la scena non le copre (`covers` = `[daX, aX, y, ...]`, piu' la superficie dell'acqua). |
 | `gfx/ui.js` | `UI.hint`, `UI.bar`, `UI.stars`, `UI.lines`, `UI.red.add/clear/flush`, `UI.invert` | Helper di HUD; i pixel rossi si dipingono per ultimi. |
 | `audio/synth.js` | `Synth.create({ volume, effects(api), loops })` | WebAudio generico. `effects({ tone, noise })` -> mappa nome/funzione; `loops.build({ context, master, noiseSource, filter, gain })` e `loops.update(nodes, levels, now)`. |
 | `input/input.js` | `Input.configure(bindings)`, `sample()`, `syncUI()`, `rumble()`, `device` | Tastiera, gamepad, levetta touch, pulsanti. Vedi sotto. |
@@ -67,7 +68,7 @@ Un gioco e' `games/<id>/` con:
 - `index.html`: pagina di sviluppo; il blocco `<!-- build:js --> ... <!-- /build:js -->` elenca gli script **relativi alla pagina** (`../../engine/...` e `src/...`), nell'ordine di caricamento.
 - `src/` e, per i test, `test/`.
 
-`node engine/tools/build.js [id...]` costruisce `dist/<id>.html`, `dist/site/<id>/` (PWA con scope nella cartella del gioco, cache `<id>-<hash>`) e l'hub `dist/site/index.html` generato dai `game.json`.
+`node engine/tools/build.js [id...]` costruisce `dist/<id>.html`, `dist/site/<id>/` (PWA con scope nella cartella del gioco, cache `<id>-<hash>`: la Cache Storage e' condivisa da tutti i giochi della stessa origine, quindi ogni service worker cancella solo le proprie vecchie versioni, quelle col prefisso `<id>-`) e l'hub `dist/site/index.html` generato dai `game.json`.
 
 ## Test
 

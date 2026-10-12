@@ -79,5 +79,16 @@ const Lighting = (() => {
     canvasContext.fillStyle = '#fff';
   }
 
-  return { darkness, fog };
+  // Drifting dashed fog banks, hidden near the viewer: clear = [x, y, radius]. Leaves fillStyle at '#fff'.
+  function fogBanks({ time, wind, clear }) {
+    canvasContext.fillStyle = '#fff';
+    for (let i = 0; i < 9; i++) {
+      const bankY = 22 + i * 19 + round(Math.sin(time * 0.4 + i) * 3);
+      const bankX = ((i * 131 + time * (8 + (i % 3) * 5) + wind * time * 4) % (SCREEN_WIDTH + 80) + SCREEN_WIDTH + 80) % (SCREEN_WIDTH + 80) - 40;
+      if (Math.hypot(bankX + 15 - clear[0], bankY - clear[1]) < clear[2]) continue;
+      for (let dash = 0; dash < 30; dash += 3) canvasContext.fillRect(round(bankX + dash), bankY + ((dash / 3) & 1), 1, 1);
+    }
+  }
+
+  return { darkness, fog, fogBanks };
 })();

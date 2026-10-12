@@ -60,9 +60,10 @@ module.exports = async (browser, ctx) => {
   const overlaps = await phone.page.evaluate(() => {
     const canvasRect = document.getElementById('game').getBoundingClientRect();
     const overlapping = [];
-    for (const group of ['tr', 'br', 'bl']) {
-      const rect = document.querySelector('.btns.' + group).getBoundingClientRect();
-      if (rect.left < canvasRect.right && canvasRect.left < rect.right && rect.top < canvasRect.bottom && canvasRect.top < rect.bottom) overlapping.push(group);
+    // Every button group except the centre one (bc, which sits under the canvas) must stay in the side bands.
+    for (const group of document.querySelectorAll('.btns:not(.bc)')) {
+      const rect = group.getBoundingClientRect();
+      if (rect.left < canvasRect.right && canvasRect.left < rect.right && rect.top < canvasRect.bottom && canvasRect.top < rect.bottom) overlapping.push(group.className.replace('btns', '').trim());
     }
     return overlapping;
   });

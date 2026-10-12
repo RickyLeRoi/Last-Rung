@@ -1,0 +1,121 @@
+{
+ "game": "faro",
+ "scenarios": {
+  "F01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "frame": "1514fb3b1b93e8f0640db7028bad7cdadf61006e"
+    }
+   ]
+  },
+  "F02": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "9313455aa5484bf0b12aeee9bb0d59b8885a1164"
+    },
+    {
+     "at": 600,
+     "frame": "36c4b9694fbbc2124df130be038ac590068544f0"
+    },
+    {
+     "at": 900,
+     "frame": "178a53e41ca3f3ca886e5e5cebd4dd96160a05a4"
+    },
+    {
+     "at": 1200,
+     "frame": "a91b150f78898568148c3bf03905ca2c85b43bcd"
+    },
+    {
+     "at": 1500,
+     "frame": "efc78a838030cdea1fbf62fa7d6f0f240410da1e"
+    },
+    {
+     "at": 1800,
+     "frame": "6614588b8ee4b226770320a5a5d73966dcbc999e"
+    },
+    {
+     "at": 2100,
+     "frame": "8ff438b08a5eece8a26d3dbfa39f609acd13002a"
+    },
+    {
+     "at": 2400,
+     "frame": "b8428519c234ffdd18ae9a27c4837ec3889862ad"
+    }
+   ]
+  },
+  "F03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "5181f72567b40dba42a046896f69fe2acc18d96a"
+    },
+    {
+     "at": 600,
+     "frame": "0fa8a425526fc34e938550299e706dd25eaa3149"
+    },
+    {
+     "at": 900,
+     "frame": "0a17887b93d2ed837c507bfc50491a320c1889ad"
+    },
+    {
+     "at": 1200,
+     "frame": "785702779453b9bb5b41a1fda879301591f63d51"
+    },
+    {
+     "at": 1500,
+     "frame": "aa09789631b7daf100ff8718330f405d163c3da6"
+    },
+    {
+     "at": 1800,
+     "frame": "9319a8687324669beb32216cb235fdcd53174e6b"
+    },
+    {
+     "at": 2100,
+     "frame": "22bc6f8369b5b956e7c5492c43fceaa9652da89a"
+    },
+    {
+     "at": 2400,
+     "frame": "e046abab9e5825801fa966c96f0d95b27758b561"
+    }
+   ]
+  },
+  "F04": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "382292baba4334e5db4be1ff7e8af37cf3ed8bab"
+    },
+    {
+     "at": 600,
+     "frame": "87df6920227395eff5d21f40fc8224549ccf8eb5"
+    },
+    {
+     "at": 900,
+     "frame": "7aaeab1f18ca50e81305b2e9204e80ec431717f2"
+    },
+    {
+     "at": 1200,
+     "frame": "c1ff2dc6fc938e852c182d3fa55d4d4bf757199c"
+    },
+    {
+     "at": 1500,
+     "frame": "d46035748f153f1c12d4ee452735c43e3028d090"
+    },
+    {
+     "at": 1800,
+     "frame": "a6bd624065b519bcbece1f027c92a0224327d3aa"
+    },
+    {
+     "at": 2100,
+     "frame": "a7ec1833f1d8c5bbd89d0091e98afeac28747ea2"
+    },
+    {
+     "at": 2400,
+     "frame": "364ae01d33723c16316e2dd9c843bd4489577265"
+    }
+   ]
+  }
+ }
+}

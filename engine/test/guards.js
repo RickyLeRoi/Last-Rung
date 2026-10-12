@@ -19,13 +19,14 @@ const ENGINE_CONFIG_KEYS = ['W', 'H', 'input', 'maxParticles', 'touchGutter'];
 const MATH_RANDOM_ALLOWED = [/^games\/[^/]+\/src\/render\.js$/, /^engine\/audio\/synth\.js$/];
 const isMathRandomAllowed = file => MATH_RANDOM_ALLOWED.some(pattern => pattern.test(file));
 
-// Pages and the folders whose .js files must be listed in their build:js block: one page per game.
+// One page per game; the game's own src/ must be listed in full, engine modules only need to be used by at least one game.
+const ENGINE_ROOTS = ['engine/core', 'engine/gfx', 'engine/audio', 'engine/input', 'engine/world'];
 function findPages() {
   const pages = [];
   const gamesDirectory = path.join(ROOT, 'games');
   if (fs.existsSync(gamesDirectory)) {
     for (const game of fs.readdirSync(gamesDirectory)) {
-      if (fs.existsSync(path.join(gamesDirectory, game, 'index.html'))) pages.push({ html: 'games/' + game + '/index.html', sourceRoots: ['games/' + game + '/src', 'engine/core', 'engine/gfx', 'engine/audio', 'engine/input', 'engine/world'] });
+      if (fs.existsSync(path.join(gamesDirectory, game, 'index.html'))) pages.push({ html: 'games/' + game + '/index.html', sourceRoots: ['games/' + game + '/src'] });
     }
   }
   return pages;
@@ -90,24 +91,28 @@ function scanForbiddenCalls(file, problems) {
   });
 }
 
+// Returns the list of scripts the page loads (repository-relative paths).
 function checkPageScripts({ html, sourceRoots }, problems) {
   const page = fs.readFileSync(path.join(ROOT, html), 'utf8');
   const start = page.indexOf('<!-- build:js'), end = page.indexOf('<!-- /build:js -->');
-  if (start < 0 || end < 0) { problems.push(html + ': blocco build:js non trovato'); return; }
+  if (start < 0 || end < 0) { problems.push(html + ': blocco build:js non trovato'); return []; }
   const base = path.posix.dirname(html);
   const listed = [...page.slice(start, end).matchAll(/<script src="([^"]+)"/g)].map(match => path.posix.normalize(base === '.' ? match[1] : base + '/' + match[1]));
   for (const source of listed) if (!fs.existsSync(path.join(ROOT, source))) problems.push(html + ': script elencato ma inesistente: ' + source);
   for (const file of sourceRoots.flatMap(listScripts)) if (!listed.includes(file)) problems.push(html + ': file non elencato nel blocco build:js: ' + file);
   const duplicates = listed.filter((source, i) => listed.indexOf(source) !== i);
   for (const source of duplicates) problems.push(html + ': script elencato due volte: ' + source);
+  return listed;
 }
 
 function runGuards() {
   const problems = [];
   const pages = findPages();
-  const gameFiles = new Set(pages.flatMap(page => page.sourceRoots.flatMap(listScripts)));
+  const engineFiles = ENGINE_ROOTS.flatMap(listScripts);
+  const gameFiles = new Set([...pages.flatMap(page => page.sourceRoots.flatMap(listScripts)), ...engineFiles]);
   for (const file of [...gameFiles].sort()) scanForbiddenCalls(file, problems);
-  for (const page of pages) checkPageScripts(page, problems);
+  const used = new Set(pages.flatMap(page => checkPageScripts(page, problems)));
+  for (const file of engineFiles) if (!used.has(file)) problems.push(file + ': modulo dell engine non usato da nessun gioco');
   return { problems, filesScanned: gameFiles.size };
 }
 

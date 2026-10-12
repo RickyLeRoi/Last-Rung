@@ -11,7 +11,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { GAME_URL, GAME_ID, GAME_DIR, check, installManualClock, installSeededRandom, advance, readGrayFrame, collectErrors } = require('./lib');
 const { boot, randomKeysPolicy } = require('../harness');
-const { SHARED_SCENARIOS } = require(path.join(GAME_DIR, 'test', 'scenarios'));
+const SCENARIOS_FILE = path.join(GAME_DIR, 'test', 'scenarios.js');
 
 const BASELINE_FILE = path.join(GAME_DIR, 'test', 'golden', GAME_ID + '.browser.json');
 const CHECKPOINT_EVERY = 300;
@@ -67,6 +67,8 @@ const sha1 = bytes => crypto.createHash('sha1').update(bytes).digest('hex');
 const differingPixels = (first, second) => { let count = 0; for (let i = 0; i < first.length; i++) if (first[i] !== second[i]) count++; return count; };
 
 module.exports = async (browser, ctx) => {
+  if (!fs.existsSync(SCENARIOS_FILE)) { console.log('  --   golden browser: nessuno scenario per ' + GAME_ID + ' (si aggiungono dopo l approvazione della versione giocabile)'); return; }
+  const { SHARED_SCENARIOS } = require(SCENARIOS_FILE);
   const baseline = fs.existsSync(BASELINE_FILE) ? JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf8')) : { game: GAME_ID, scenarios: {} };
   const results = {};
   for (const scenario of Object.values(SHARED_SCENARIOS)) {

@@ -371,27 +371,14 @@ function drawNight(offsetX, offsetY) {
 }
 
 function drawNightSky(cameraX) {
-  const level = game.L, columnTop = new Int16Array(SCREEN_WIDTH).fill(SCREEN_HEIGHT), frame = game.frame;
-  const coverColumns = (fromX, toX, y) => {
-    for (let column = Math.max(0, Math.floor(fromX)); column < Math.min(SCREEN_WIDTH, Math.ceil(toX)); column++) if (y < columnTop[column]) columnTop[column] = y;
-  };
-  for (const solid of level.solids) coverColumns(solid.x - cameraX - 1, solid.x + solid.w - cameraX + 1, solid.y - 1);
-  for (const hazard of level.haz) coverColumns(hazard.x0 - cameraX - 1, hazard.x1 - cameraX + 2, hazard.y0 - 2);
-  for (const building of level.skyline) { const x = round(building.x - cameraX * 0.35); coverColumns(x - 1, x + building.w + 2, building.y - 1); }
-  for (const fire of level.fires) coverColumns(fire.x - cameraX - 4, fire.x + fire.w - cameraX + 4, fire.y - fire.h - 6);
-  const heli = game.heli;
-  if (heli.state !== 'dead') coverColumns(heli.x - cameraX - 2, heli.x + 34 - cameraX, heli.y - 2);
-  for (let column = 0; column < SCREEN_WIDTH; column++) { const surfaceY = waterSurfaceY(column + cameraX); if (surfaceY - 1 < columnTop[column]) columnTop[column] = round(surfaceY) - 1; }
-  const isVisible = (x, y) => x >= 0 && x < SCREEN_WIDTH && y < columnTop[x];
-  for (const star of level.stars) {
-    const x = round(star.x - cameraX * 0.08);
-    if (!isVisible(x, star.y) || (star.tw && ((frame + star.ph) % 120) < 10)) continue;
-    canvasContext.fillRect(x, star.y, 1, 1);
-  }
-  if (level.moon) {
-    const moonX = round(level.moon.x - cameraX * 0.03), moonY = level.moon.y;
-    for (const moonPixel of moonPixels(level)) if (isVisible(moonX + moonPixel[0], moonY + moonPixel[1])) canvasContext.fillRect(moonX + moonPixel[0], moonY + moonPixel[1], 1, 1);
-  }
+  const level = game.L, heli = game.heli, covers = [];
+  for (const solid of level.solids) covers.push(solid.x - cameraX - 1, solid.x + solid.w - cameraX + 1, solid.y - 1);
+  for (const hazard of level.haz) covers.push(hazard.x0 - cameraX - 1, hazard.x1 - cameraX + 2, hazard.y0 - 2);
+  for (const building of level.skyline) { const x = round(building.x - cameraX * 0.35); covers.push(x - 1, x + building.w + 2, building.y - 1); }
+  for (const fire of level.fires) covers.push(fire.x - cameraX - 4, fire.x + fire.w - cameraX + 4, fire.y - fire.h - 6);
+  if (heli.state !== 'dead') covers.push(heli.x - cameraX - 2, heli.x + 34 - cameraX, heli.y - 2);
+  const moon = level.moon ? { x: level.moon.x, y: level.moon.y, pixels: moonPixels(level) } : null;
+  Sky.drawNight({ cameraX, covers, waterY: waterSurfaceY, stars: level.stars, moon, frame: game.frame });
 }
 
 // Fog: clear near the heli, DITHER further out, DARK far away; fires punch holes through it.
@@ -401,13 +388,7 @@ function drawFog(offsetX, offsetY) {
   const clear = [heliX, heliY, fogConfig.clear], lights = [];
   for (const fire of level.fires) lights.push(fire.x + fire.w / 2 - offsetX, fire.y - fire.h / 2 + offsetY, fogConfig.fire + fire.w / 2);
   Lighting.fog({ clear, lights, thin: [heliX, heliY, fogConfig.thin], dark: DARK, dither: DITHER });
-  const time = game.time;
-  for (let i = 0; i < 9; i++) {
-    const bankY = 22 + i * 19 + round(Math.sin(time * 0.4 + i) * 3);
-    const bankX = ((i * 131 + time * (8 + (i % 3) * 5) + game.wind * time * 4) % (SCREEN_WIDTH + 80) + SCREEN_WIDTH + 80) % (SCREEN_WIDTH + 80) - 40;
-    if (Math.hypot(bankX + 15 - heliX, bankY - heliY) < fogConfig.clear) continue;
-    for (let dash = 0; dash < 30; dash += 3) canvasContext.fillRect(round(bankX + dash), bankY + ((dash / 3) & 1), 1, 1);
-  }
+  Lighting.fogBanks({ time: game.time, wind: game.wind, clear });
 }
 
 function drawBeacons() {

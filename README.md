@@ -9,6 +9,7 @@ Rilasciato con licenza [MIT](LICENSE).
 | Gioco | Cartella | Descrizione |
 |---|---|---|
 | Last Rung | [games/last-rung/](games/last-rung/README.md) | Soccorso in elicottero: comandi, regole e livelli |
+| Il Faro | [games/faro/](games/faro/README.md) | Guida le navi al porto con la luce del faro (prototipo) |
 
 Online (GitHub Pages): l'hub sulla radice elenca i giochi, ognuno ha il suo indirizzo, ad esempio `https://rickyleroi.github.io/one-bit-games/last-rung/`. Ogni gioco è una app a sé (service worker nella propria cartella): chi aveva installato Last Rung dal vecchio indirizzo deve reinstallarlo.
 
@@ -21,6 +22,7 @@ engine/           il motore comune (contratto e API in engine/README.md)
   test/           harness, test unitari, guardie, conformance, suite E2E generiche
 games/
   last-rung/      un gioco: game.json, index.html, src/, test/, README.md
+  faro/           il secondo gioco
 dist/             output della build, non versionato (si genera con npm run build)
   <id>.html       il gioco in un solo file (doppio clic)
   site/           quello che va su Pages: index.html (hub) e <id>/ (app installabile)
@@ -52,7 +54,7 @@ Gli snapshot golden (`games/<id>/test/golden/`) non si rigenerano per far passar
 ### Convenzioni
 
 - Nomi per esteso (solo `i`/`j` per gli indici e `x`/`y` per le coordinate); commenti in inglese e solo dove il motivo non è ovvio; testi dell'interfaccia in italiano. La minificazione avviene solo nella build.
-- Un gioco si aggiunge creando `games/<id>/` con `game.json`, `index.html` (blocco `build:js`) e `src/`; la build, l'hub e la conformance lo trovano da soli. Vedi [engine/README.md](engine/README.md).
+- Un gioco si aggiunge creando `games/<id>/` con `game.json`, `index.html` (blocco `build:js`) e `src/`; la build, l'hub e la conformance lo trovano da soli. Vedi [engine/README.md](engine/README.md) e, per chi crea un nuovo gioco (persone o agent), le [linee guida](GUIDELINES.md): colori, CSS, nomi, uso dell'engine, test e processo.
 
 ## Pubblicare
 

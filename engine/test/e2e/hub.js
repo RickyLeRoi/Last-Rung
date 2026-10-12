@@ -35,8 +35,15 @@ module.exports = async (browser, ctx) => {
   if (games.length) {
     const game = games[0];
     await page.goto(baseUrl + game.id + '/?debug');
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    await page.waitForTimeout(500);
+    // Wait until the service worker has filled its cache (the id-prefixed one), not just until it is active.
+    await page.evaluate(async id => {
+      await navigator.serviceWorker.ready;
+      for (let attempt = 0; attempt < 50; attempt++) {
+        const name = (await caches.keys()).find(key => key.startsWith(id + '-'));
+        if (name && (await (await caches.open(name)).keys()).length >= 6) return;
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }, game.id);
     await browserContext.setOffline(true);
     await page.reload();
     const offlineState = await page.waitForFunction(name => window[name] && window[name].game.state, game.debugGlobal, { timeout: 3000 }).then(handle => handle.jsonValue()).catch(() => null);

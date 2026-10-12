@@ -1,0 +1,12 @@
+{
+  "id": "faro",
+  "title": "Il Faro",
+  "shortName": "Il Faro",
+  "lang": "it",
+  "description": "Guida le navi al porto con la luce del faro, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__faro"
+}
