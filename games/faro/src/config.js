@@ -27,5 +27,11 @@ const CONFIG = {
   rocks: { firstX: 130, lastX: 290, fogLastX: 230, fogMax: 3, max: 5 },
   waves: { first: 60, gap: 170, between: 460, size: 2, maxShips: 6 },    // frames of play time
   night: { halo: 16, lantern: 4, tower: { y: 116, radius: 40 } },
+  // far coast behind the sea (px above the horizon): tops between horizon - lowest - amplitude and horizon - lowest
+  backdrop: {
+    mountains: { period: 384, step: 48, lowest: 10, amplitude: 30, roughness: 0.25 },
+    coast: { period: 384, step: 32, lowest: 5, amplitude: 10, roughness: 0.35 },
+    lights: 8,
+  },
   score: { dock: 100, starBonus: [0, 0, 100, 250], twoStars: 0.75 },
 };

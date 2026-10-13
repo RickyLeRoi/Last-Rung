@@ -22,6 +22,12 @@ const CONFIG = {
   victim: { w: 8, h: 4, depthMin: 8, depthRange: 12, depthPerLoop: 3, spacing: 90, crush: 14, crushDecay: 0.5, collapseSound: 20, survival: 5400, survivalPerLoop: 500, minSurvival: 3600, max: 5 },
   artva: { range: 90, slowBeep: 44, fastBeep: 6, digits: 25, near: 0.66, mid: 0.33 },
   avalanche: { warning: 150, speed: 2.2, back: 130, ahead: 110, thickness: 5, hitDistance: 5, stun: 120, firstAt: 1500, gap: 1800, gapPerLoop: 200, minGap: 1000, deadlyFromLoop: 2 },
+  // mountain ranges behind the slope (screen px with the camera at the top): tops between baseY - lowest - amplitude and baseY - lowest
+  backdrop: {
+    baseY: 300,
+    peaks: { period: 768, step: 64, lowest: 190, amplitude: 62, roughness: 0.45 },
+    range: { period: 768, step: 96, lowest: 158, amplitude: 46, roughness: 0.3 },
+  },
   weather: { stormSnow: 160, nightSnow: 40, stormWind: 1.2, push: 0.03, fall: 0.6, fallSpread: 0.4, drift: 0.2 },
   night: { lamp: 24, coneLength: 90, coneHalf: 0.35, conePitch: 0.45 },
   score: { saved: 100, perSecond: 5, starBonus: [0, 0, 100, 250], twoStars: 0.75 },

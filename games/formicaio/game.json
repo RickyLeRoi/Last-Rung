@@ -1,0 +1,12 @@
+{
+  "id": "formicaio",
+  "title": "Formicaio",
+  "shortName": "Formicaio",
+  "lang": "it",
+  "description": "Guida la colonia con le piste di feromone: scava il nido, porta il cibo e falla crescere prima dell'inverno, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__formicaio"
+}

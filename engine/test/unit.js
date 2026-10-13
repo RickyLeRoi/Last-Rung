@@ -165,6 +165,24 @@ test('Terrain: settleColumn fa cadere solo il materiale sciolto, una riga per vo
   assertEqual([Terrain.get(terrain, 2, 9), Terrain.get(terrain, 2, 7), Terrain.get(terrain, 2, 6)], [1, 1, 0], 'la neve si posa sulla roccia');
 });
 
+test('Terrain: flowColumn fa scendere il liquido e lo allarga di lato, senza perderne e senza attraversare i muri', () => {
+  const { Terrain } = loadScripts(['engine/world/terrain.js'], ['Terrain']);
+  const WATER = 5, ROCK = 2, terrain = Terrain.make(10, 12);
+  Terrain.fillRect(terrain, 0, 10, 10, 2, ROCK);
+  Terrain.fillRect(terrain, 1, 4, 1, 6, ROCK);
+  Terrain.fillRect(terrain, 8, 4, 1, 6, ROCK);
+  Terrain.fillRect(terrain, 4, 2, 1, 5, WATER);
+  const count = () => terrain.cells.filter(cell => cell === WATER).length;
+  const moves = [];
+  Terrain.flowColumn(terrain, 4, WATER, 0, (fromX, toX, toY) => moves.push([fromX, toX, toY]));
+  assertEqual(moves[0], [4, 4, 7], 'la cella piu bassa scende per prima');
+  for (let frame = 0; frame < 200; frame++) for (let x = 0; x < 10; x++) Terrain.flowColumn(terrain, x, WATER, frame & 1);
+  assertEqual(count(), 5, 'acqua conservata');
+  assert([2, 3, 4, 5, 6, 7].filter(x => Terrain.get(terrain, x, 9) === WATER).length === 5, 'il liquido non si e steso sul fondo: ' + [2, 3, 4, 5, 6, 7].map(x => Terrain.get(terrain, x, 9)).join(','));
+  assert(Terrain.get(terrain, 0, 9) === 0 && Terrain.get(terrain, 9, 9) === 0, 'il liquido ha attraversato un muro');
+  assertEqual(Terrain.get(terrain, 1, 5), ROCK, 'il muro e rimasto roccia');
+});
+
 test('Terrain: moveRect si ferma sulle pareti, sale i gradini bassi, non attraversa i muri sottili', () => {
   const { Terrain } = loadScripts(['engine/world/terrain.js'], ['Terrain']);
   const terrain = Terrain.make(60, 40);

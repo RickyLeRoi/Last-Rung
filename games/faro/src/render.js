@@ -100,7 +100,7 @@ function drawNight() {
 }
 
 function drawStars() {
-  const covers = [TOWER_X - 9, TOWER_X + 9, TOWER_TOP_Y - 24, 0, ISLAND_WIDTH, TOWER_BASE_Y, ISLAND_WIDTH, 100, PIER_Y - 22];
+  const covers = [TOWER_X - 9, TOWER_X + 9, TOWER_TOP_Y - 24, 0, ISLAND_WIDTH, TOWER_BASE_Y, ISLAND_WIDTH, 100, PIER_Y - 22, ...Parallax.covers(game.L.backdrop, 0, 0)];
   Sky.drawNight({ cameraX: 0, covers, waterY: waterSurfaceY, stars: game.L.stars, moon: null, frame: game.frame });
 }
 
@@ -188,6 +188,7 @@ function render() {
   canvasContext.setTransform(1, 0, 0, 1, 0, 0);
   canvasContext.globalCompositeOperation = 'source-over';
   canvasContext.fillStyle = '#000'; canvasContext.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); canvasContext.fillStyle = '#fff';
+  Parallax.draw(game.L.backdrop, 0, 0);
   drawSea();
   drawRocks();
   drawLighthouse();

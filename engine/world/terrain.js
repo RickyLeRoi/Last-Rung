@@ -78,6 +78,32 @@ const Terrain = (() => {
     return moved;
   }
 
+  // 20261013 ++ RG #liquid_material
+  // Liquid (water, lava): like settleColumn, but a cell that cannot fall moves one cell sideways into an empty cell, trying first the
+  // side given by the parity (0 = left, 1 = right; alternate it per frame so the liquid spreads evenly). No randomness. Calls
+  // onMove(fromX, toX, toY) per moved cell (the game marks the neighbour columns to process next); returns how many moved.
+  function flowColumn(terrain, x, material, parity, onMove) {
+    if (x < 0 || x >= terrain.width) return 0;
+    const { cells, width, height } = terrain;
+    const isEmpty = (column, row) => column >= 0 && column < width && row < height && cells[row * width + column] === 0;
+    let moved = 0;
+    for (let y = height - 1; y >= 0; y--) {
+      if (cells[y * width + x] !== material) continue;
+      let toX = x, toY = y;
+      if (isEmpty(x, y + 1)) toY = y + 1;
+      else {
+        const first = parity ? 1 : -1;
+        if (isEmpty(x + first, y)) toX = x + first; else if (isEmpty(x - first, y)) toX = x - first;
+      }
+      if (toX === x && toY === y) continue;
+      cells[toY * width + toX] = material;
+      cells[y * width + x] = 0;
+      moved++;
+      if (onMove) onMove(x, toX, toY);
+    }
+    return moved;
+  }
+
   // First solid row at or below fromY in column x (the height of the mask when the column is empty down to the bottom).
   function surfaceY(terrain, x, fromY) {
     const column = Math.floor(x);
@@ -124,12 +150,20 @@ const Terrain = (() => {
   function draw(terrain, left, top, width, height, patterns) {
     const { canvasContext } = Gfx;
     left = Math.floor(left); top = Math.floor(top);
+    // 20261013 ** RG #draw_speed: reads the cells directly (same rules as get: above empty, sides and below solid)
+    const { cells, width: terrainWidth, height: terrainHeight } = terrain;
     const edges = [];
     for (let y = top; y < top + height; y++) {
+      const rowInside = y >= 0 && y < terrainHeight, rowStart = y * terrainWidth;
       let runStart = left, runMaterial = get(terrain, left, y);
       for (let x = left; x <= left + width; x++) {
-        const material = x < left + width ? get(terrain, x, y) : -1;
-        if (material > 0 && material !== 255 && (!isSolid(terrain, x, y - 1) || !isSolid(terrain, x, y + 1) || !isSolid(terrain, x - 1, y) || !isSolid(terrain, x + 1, y))) edges.push(x, y);
+        const material = x >= left + width ? -1 : y < 0 ? 0 : rowInside && x >= 0 && x < terrainWidth ? cells[rowStart + x] : 255;
+        if (material > 0 && material !== 255) {
+          const index = rowStart + x;
+          const openAbove = y === 0 || cells[index - terrainWidth] === 0, openBelow = y + 1 < terrainHeight && cells[index + terrainWidth] === 0;
+          const openLeft = x > 0 && cells[index - 1] === 0, openRight = x + 1 < terrainWidth && cells[index + 1] === 0;
+          if (openAbove || openBelow || openLeft || openRight) edges.push(x, y);
+        }
         if (material === runMaterial) continue;
         if (runMaterial > 0 && patterns[runMaterial]) {
           canvasContext.fillStyle = '#fff'; canvasContext.fillRect(runStart, y, x - runStart, 1);
@@ -142,5 +176,5 @@ const Terrain = (() => {
     for (let i = 0; i < edges.length; i += 2) canvasContext.fillRect(edges[i], edges[i + 1], 1, 1);
   }
 
-  return { make, get, isSolid, fillRect, fillCircle, carveCircle, settleColumn, surfaceY, hitsRect, moveRect, draw };
+  return { make, get, isSolid, fillRect, fillCircle, carveCircle, settleColumn, flowColumn, surfaceY, hitsRect, moveRect, draw };
 })();

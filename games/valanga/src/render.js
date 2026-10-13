@@ -23,12 +23,7 @@ function drawSky() {
     const sunX = 316, sunY = 34 - round(game.camY * 0.05);
     for (let y = -7; y <= 7; y++) { const halfWidth = round(Math.sqrt(49 - y * y)); horizontalLine(sunX - halfWidth, sunX + halfWidth, sunY + y); }
   }
-  // A far ridge in parallax, dotted, behind the slope.
-  const left = game.camX * 0.2, top = game.camY * 0.2;
-  for (let x = 0; x < SCREEN_WIDTH; x += 2) {
-    const ridgeX = x + left, y = round(90 + 18 * Math.sin(ridgeX * 0.015 + level.ridgePhase) + 9 * Math.sin(ridgeX * 0.041) - top);
-    canvasContext.fillRect(x, y, 1, 1);
-  }
+  Parallax.draw(level.backdrop, cameraLeft(), cameraTop());
 }
 
 function drawBuried() {

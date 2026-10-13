@@ -5,7 +5,7 @@
    "checkpoints": [
     {
      "at": 240,
-     "frame": "71a11fd6ff7995c442ae158ea6f7af5dfb9ba4d4"
+     "frame": "c92adff5a9780e065a9c014b78b05d9562cfd894"
     }
    ]
   },
@@ -13,35 +13,35 @@
    "checkpoints": [
     {
      "at": 300,
-     "frame": "478efead87120085089552cf8941ee9a5771827c"
+     "frame": "1f57f4f4a4de435fd4e2f974dede1184332db429"
     },
     {
      "at": 600,
-     "frame": "b2248f520ec67b6546a611c0d5cf0ef15d584b65"
+     "frame": "c097e7ce19ae0e8cf0347ece5bd457495757a9d2"
     },
     {
      "at": 900,
-     "frame": "5cea71e42f961f670868062313ba14d8dda27021"
+     "frame": "48f9de9f87c624a759496e4ae214260bc857d466"
     },
     {
      "at": 1200,
-     "frame": "12083d7254382875bb4bc8fd9d53b6870cb55c19"
+     "frame": "6f7ede369ed2e1f1f3542b5c56a5d7fe9603275e"
     },
     {
      "at": 1500,
-     "frame": "78c69d288f69fdf414667e2f0060e4d0360e847e"
+     "frame": "836185ae6f6a77b31a75d1424209124f0b952cf4"
     },
     {
      "at": 1800,
-     "frame": "2bef29c2598535fe1eefaf974e1aa079e1769c09"
+     "frame": "adaa1aec0f81dd0117009874d73456bc76389d7c"
     },
     {
      "at": 2100,
-     "frame": "daa791b659db1e479b0a03bdc244b1cc200835e7"
+     "frame": "263be4e7239c3c46c15cfcb9de6b8434151e97ae"
     },
     {
      "at": 2400,
-     "frame": "6546e3b3b05e0e41ade5500e3879eda480194024"
+     "frame": "c288967756c7ddc7d791680d0809f4d4d5d1be9c"
     }
    ]
   },
@@ -49,27 +49,27 @@
    "checkpoints": [
     {
      "at": 300,
-     "frame": "66fd3fd9b9380b6d107fd9709eac19d0fc5d5970"
+     "frame": "6b5ce51654b39e2f2a24c6a7b99c8d37f25ac907"
     },
     {
      "at": 600,
-     "frame": "a27ca5aed8543de5b2d67503a42042dae2eb5aaa"
+     "frame": "7ffa3fcb083010f789a31c65bf38e54eba1bdb68"
     },
     {
      "at": 900,
-     "frame": "e38c035b9cd5e44612301b9272a1f46089ec639b"
+     "frame": "fae7f687238d3d5f10e44439e1fb2f5f1e46030b"
     },
     {
      "at": 1200,
-     "frame": "e627637c3dafcc88063bd01055b3d3053fd3baf7"
+     "frame": "c0de91a75a80565b0152cdc3c9d10054fb98c6bf"
     },
     {
      "at": 1500,
-     "frame": "bed0c8698d6c2d9ba92fd333a95178fe13d16574"
+     "frame": "adb7948eb56c127b61ee9189af0edfbf429f84db"
     },
     {
      "at": 1800,
-     "frame": "4727c71db81250fb9ada73aefa456b7a1044b80d"
+     "frame": "2a63def134149999de9a143dd9d4cdee5f6834d4"
     }
    ]
   },
@@ -77,27 +77,27 @@
    "checkpoints": [
     {
      "at": 300,
-     "frame": "7a46af12b3b53021bdce61f78853c970718654a7"
+     "frame": "d95b37371f315df031e65ab735eb5e5ae62fb5ad"
     },
     {
      "at": 600,
-     "frame": "a7c298e04e36271a40844f000196032c9d95416f"
+     "frame": "aade49ee1836106b58728aca123e31d22797c4c4"
     },
     {
      "at": 900,
-     "frame": "c83a34971668fdb801d689b1512451f20d1fc50e"
+     "frame": "194d44ec6ca6212780823284128afdfd311bf6f6"
     },
     {
      "at": 1200,
-     "frame": "2bf24996ce0b767f25966504159b16db8f6cbc97"
+     "frame": "5c4778ea12139fbe26d1c600b175171ee3a38ef8"
     },
     {
      "at": 1500,
-     "frame": "c73fc0d683c44b81b920fddaca1413ecdd85819f"
+     "frame": "dca642d18adc79191e7141cd66d4086a37350d29"
     },
     {
      "at": 1800,
-     "frame": "f53cf6a4b0e9394d191436fca5e29a83fa5b1c35"
+     "frame": "656e53ca38ce958b002b74e5e6f21dd97609aa83"
     }
    ]
   }

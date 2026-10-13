@@ -89,7 +89,7 @@ function genLevel(spec) {
     avalancheAt: avalanches ? avalancheConfig.firstAt : 0,
     avalancheGap: Math.max(avalancheConfig.minGap, avalancheConfig.gap - spec.loop * avalancheConfig.gapPerLoop),
     avalancheDeadly: spec.loop >= avalancheConfig.deadlyFromLoop,
-    ridgePhase: random() * Math.PI * 2,
+    backdrop: makeBackdrop(Math.floor(random() * 0x7fffffff)),
     stars: makeStars(random),
   };
 }

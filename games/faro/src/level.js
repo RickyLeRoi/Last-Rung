@@ -56,6 +56,7 @@ function genLevel(spec) {
     rain: storm ? 0.8 : 0, wind: storm ? 1.3 : scenario.id === 'fog' ? 0.3 : 0.2, lightning: storm, fog,
     total: shipCount, docked: 0, sunk: 0,
     water: makeWater(CONFIG.sea.base, [3 * amplitude, 1.6 * amplitude, 0.8], [1.0, 1.6, 2.7], null, CONFIG.W),
+    backdrop: makeBackdrop(spec),
   };
   return level;
 }
