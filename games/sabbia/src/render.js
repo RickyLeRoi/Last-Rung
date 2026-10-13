@@ -5,6 +5,11 @@ const { canvasContext, SCREEN_WIDTH, SCREEN_HEIGHT, DITHER, DARK, makePattern, h
 const hint = UI.hint;
 const bar = UI.bar;
 const CELL = CONFIG.grid.cell, GRID_TOP = CONFIG.grid.top;
+// Flicker and shake from the frame number and a position, not Math.random: the same frame looks the same however many times it is
+// drawn, so the browser golden matches the Node harness pixel for pixel.
+const renderNoise = (frame, salt) => (Math.imul(frame ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(salt + 0x632be5ab, 0xc2b2ae35)) >>> 0;
+const noiseUnit = (frame, salt) => renderNoise(frame, salt) / 4294967296;
+
 
 // One texture per material (white shows through '#'); fire is drawn cell by cell, flickering.
 const MATERIAL_FILL = [];
@@ -40,7 +45,8 @@ function drawWorld() {
     if (material[index] !== MATERIAL.fire) continue;
     const x = (index % COLUMNS) * CELL, y = GRID_TOP + Math.floor(index / COLUMNS) * CELL;
     canvasContext.fillRect(x, y, CELL, CELL);
-    if (Math.random() < 0.5) blackRect(x + (Math.random() < 0.5 ? 0 : 1), y + (Math.random() < 0.5 ? 0 : 1), 1, 1);
+    const flicker = renderNoise(game.frame >> 1, index);
+    if (flicker & 1) blackRect(x + ((flicker >> 1) & 1), y + ((flicker >> 2) & 1), 1, 1);
   }
 }
 

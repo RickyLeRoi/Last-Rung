@@ -1,0 +1,12 @@
+{
+  "id": "abisso",
+  "title": "Abisso",
+  "shortName": "Abisso",
+  "lang": "it",
+  "description": "Soccorso subacqueo: col minisommergibile cerca i sub nel buio delle grotte e riportali alla nave, pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__abisso"
+}

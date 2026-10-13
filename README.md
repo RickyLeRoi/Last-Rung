@@ -10,6 +10,9 @@ Rilasciato con licenza [MIT](LICENSE).
 |---|---|---|
 | Last Rung | [games/last-rung/](games/last-rung/README.md) | Soccorso in elicottero: comandi, regole e livelli |
 | Il Faro | [games/faro/](games/faro/README.md) | Guida le navi al porto con la luce del faro (prototipo) |
+| Valanga | [games/valanga/](games/valanga/README.md) | Soccorso alpino: ARTVA, sonda e pala prima che finisca l'aria (prototipo) |
+| Formicaio | [games/formicaio/](games/formicaio/README.md) | Guida la colonia con le piste e falla crescere prima dell'inverno (prototipo) |
+| Sabbia | [games/sabbia/](games/sabbia/README.md) | Laboratorio di materiali che cadono, bruciano ed evaporano, con sei sfide (prototipo) |
 
 Online (GitHub Pages): l'hub sulla radice elenca i giochi, ognuno ha il suo indirizzo, ad esempio `https://rickyleroi.github.io/one-bit-games/last-rung/`. Ogni gioco è una app a sé (service worker nella propria cartella): chi aveva installato Last Rung dal vecchio indirizzo deve reinstallarlo.
 
@@ -22,7 +25,7 @@ engine/           il motore comune (contratto e API in engine/README.md)
   test/           harness, test unitari, guardie, conformance, suite E2E generiche
 games/
   last-rung/      un gioco: game.json, index.html, src/, test/, README.md
-  faro/           il secondo gioco
+  faro/ valanga/ formicaio/ sabbia/   gli altri giochi (senza-luce/ e' un prototipo parcheggiato)
 dist/             output della build, non versionato (si genera con npm run build)
   <id>.html       il gioco in un solo file (doppio clic)
   site/           quello che va su Pages: index.html (hub) e <id>/ (app installabile)

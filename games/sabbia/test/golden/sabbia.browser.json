@@ -1,0 +1,97 @@
+{
+ "game": "sabbia",
+ "scenarios": {
+  "S01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "frame": "29bcf11c7ef21add0fbf091d70d2655a16caf0e2"
+    }
+   ]
+  },
+  "S02": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "d3e1f08513cf9a36c48a245b19955496dd7f5064"
+    },
+    {
+     "at": 600,
+     "frame": "9d3592bae7fcbe8721475ff0d8062e8b34ab7fc9"
+    },
+    {
+     "at": 900,
+     "frame": "7eaaa52270522797484701f9f1f58431c2cc8a9c"
+    },
+    {
+     "at": 1200,
+     "frame": "363cd6625ca94ad99624e290afd726e28021f81d"
+    },
+    {
+     "at": 1500,
+     "frame": "d93f3546a1a8855bce190a7750e80cdee29b9665"
+    },
+    {
+     "at": 1800,
+     "frame": "601479b2a19c350007c4ff8483957f910cc4b6f5"
+    }
+   ]
+  },
+  "S03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "79e99fb43a3696c12c86bc736024a411e6692aa3"
+    },
+    {
+     "at": 600,
+     "frame": "d12050e08a4200c6ed096e73be6037e7f32578c7"
+    },
+    {
+     "at": 900,
+     "frame": "8517bb33f6d99579f5386a4c4fe47703e5c7339c"
+    },
+    {
+     "at": 1200,
+     "frame": "5452b866d9d772f7424dda3cbcb30b7ca24ebd95"
+    },
+    {
+     "at": 1500,
+     "frame": "e1620e8852f32ace4edd773777fb6d9dd3146bbc"
+    },
+    {
+     "at": 1800,
+     "frame": "b92d1522aaee42113044938bd61777b76a8cd2f1"
+    }
+   ]
+  },
+  "S04": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "frame": "9d067cb2f70a9159ae33cd994014318cc0b1b720"
+    },
+    {
+     "at": 600,
+     "frame": "abfd58dbe87fc657ae325b6836297a47b7b8151f"
+    },
+    {
+     "at": 900,
+     "frame": "a8ea2f4b6abd81a7b5a12d145b2979245f9cfe1c"
+    },
+    {
+     "at": 1200,
+     "frame": "bd35628db1b0812505a51693973d408f7e72f72f"
+    },
+    {
+     "at": 1500,
+     "frame": "047581a32f83680f007a1d0307a27d169d6ca476"
+    },
+    {
+     "at": 1800,
+     "frame": "047581a32f83680f007a1d0307a27d169d6ca476"
+    }
+   ]
+  }
+ }
+}

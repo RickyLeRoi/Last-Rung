@@ -6,10 +6,15 @@ const hint = UI.hint;
 const bar = UI.bar;
 const TERRAIN_PATTERNS = { [CONFIG.material.snow]: DITHER, [CONFIG.material.rock]: DARK };
 
+// Flicker and shake from the frame number and a position, not Math.random: the same frame looks the same however many times it is
+// drawn, so the browser golden matches the Node harness pixel for pixel.
+const renderNoise = (frame, salt) => (Math.imul(frame ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(salt + 0x632be5ab, 0xc2b2ae35)) >>> 0;
+const noiseUnit = (frame, salt) => renderNoise(frame, salt) / 4294967296;
+
 const cameraLeft = () => round(game.camX);
 const cameraTop = () => round(game.camY);
 function toWorld() {
-  const shakeX = game.shake ? round((Math.random() - 0.5) * game.shake * 2) : 0, shakeY = game.shake ? round((Math.random() - 0.5) * game.shake * 2) : 0;
+  const shakeX = game.shake ? round((noiseUnit(game.frame, 1) - 0.5) * game.shake * 2) : 0, shakeY = game.shake ? round((noiseUnit(game.frame, 2) - 0.5) * game.shake * 2) : 0;
   canvasContext.setTransform(1, 0, 0, 1, -cameraLeft() + shakeX, -cameraTop() + shakeY);
 }
 const toScreen = () => canvasContext.setTransform(1, 0, 0, 1, 0, 0);
@@ -99,7 +104,7 @@ function drawSignal() {
   const signal = game.signal, y = SCREEN_HEIGHT - 8;
   text('ARTVA', 3, y);
   if (!signal) { bar(25, y - 1, 50, 0); text('--', 80, y); return; }
-  const noise = game.L.storm ? (Math.random() - 0.5) * 0.3 : 0;
+  const noise = game.L.storm ? (noiseUnit(game.frame, 3) - 0.5) * 0.3 : 0;
   bar(25, y - 1, 50, signal.strength + noise);
   const deltaX = victimCenterX(signal.victim) - rescuerCenterX();
   text(Math.abs(deltaX) < 5 ? '▼' : deltaX < 0 ? '<' : '>', 80, y);

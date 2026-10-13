@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        game: [last-rung, faro]
+        game: [last-rung, faro, valanga, formicaio, sabbia]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

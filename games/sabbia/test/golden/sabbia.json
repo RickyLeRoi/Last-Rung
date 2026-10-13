@@ -1,0 +1,275 @@
+{
+ "game": "sabbia",
+ "scenarios": {
+  "S01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "state": "39c4d3d75caaffc5464ad720047e6cc402661087",
+     "frame": "29bcf11c7ef21add0fbf091d70d2655a16caf0e2"
+    }
+   ],
+   "end": {
+    "state": "title",
+    "frame": 240,
+    "score": 0
+   },
+   "rng": 0.5245578126050532
+  },
+  "S02": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "6c63f778428db5cc54463e590e839b6147b7ddc5",
+     "frame": "d3e1f08513cf9a36c48a245b19955496dd7f5064"
+    },
+    {
+     "at": 600,
+     "state": "37228dea15ad5fbef9455323676afa03d7dbc846",
+     "frame": "9d3592bae7fcbe8721475ff0d8062e8b34ab7fc9"
+    },
+    {
+     "at": 900,
+     "state": "20fd270a9446768bc2ff52e916d19c6ce9e28003",
+     "frame": "7eaaa52270522797484701f9f1f58431c2cc8a9c"
+    },
+    {
+     "at": 1200,
+     "state": "bebed5d642c02822c07e792515af1b87b4869ea0",
+     "frame": "363cd6625ca94ad99624e290afd726e28021f81d"
+    },
+    {
+     "at": 1500,
+     "state": "cec2404ad1404f082f029e786168f8e431e89284",
+     "frame": "d93f3546a1a8855bce190a7750e80cdee29b9665"
+    },
+    {
+     "at": 1800,
+     "state": "db480750f437d02c0040e676413bcd6b95708681",
+     "frame": "601479b2a19c350007c4ff8483957f910cc4b6f5"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1803,
+    "score": 0
+   },
+   "rng": 0.15808361442759633
+  },
+  "S03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "76de73a244ce2f16056ec465f56cf7f7f28ff39c",
+     "frame": "79e99fb43a3696c12c86bc736024a411e6692aa3"
+    },
+    {
+     "at": 600,
+     "state": "8e97b4e91bc214c1debc3d47fb324447fc9673f4",
+     "frame": "d12050e08a4200c6ed096e73be6037e7f32578c7"
+    },
+    {
+     "at": 900,
+     "state": "ab8b682d85f53e99c994c92f0b046d05f8b80721",
+     "frame": "8517bb33f6d99579f5386a4c4fe47703e5c7339c"
+    },
+    {
+     "at": 1200,
+     "state": "5350c2b0290638b9e5af79240b55ddec62e26f83",
+     "frame": "5452b866d9d772f7424dda3cbcb30b7ca24ebd95"
+    },
+    {
+     "at": 1500,
+     "state": "5d4ff6124fb7ea2f2c77b64a53fe8d0c5cfde95b",
+     "frame": "e1620e8852f32ace4edd773777fb6d9dd3146bbc"
+    },
+    {
+     "at": 1800,
+     "state": "01e0e50f48b601c09d26450563ac74a26eae8259",
+     "frame": "b92d1522aaee42113044938bd61777b76a8cd2f1"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1803,
+    "score": 0
+   },
+   "rng": 0.94384281989187
+  },
+  "S04": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "3af391a0e9e35490a0362971c16cdd6af4ad62ee",
+     "frame": "9d067cb2f70a9159ae33cd994014318cc0b1b720"
+    },
+    {
+     "at": 600,
+     "state": "fc00d9599746504a112279999bb5a0f2ec798fc9",
+     "frame": "abfd58dbe87fc657ae325b6836297a47b7b8151f"
+    },
+    {
+     "at": 900,
+     "state": "9205a720b332497175e362f1ba6a153b65485fcd",
+     "frame": "a8ea2f4b6abd81a7b5a12d145b2979245f9cfe1c"
+    },
+    {
+     "at": 1200,
+     "state": "7d8d32675da497218c6f183b654a5bc534e49a65",
+     "frame": "bd35628db1b0812505a51693973d408f7e72f72f"
+    },
+    {
+     "at": 1500,
+     "state": "940c89dfe7e540d1ae3ec8496da4efcfc7a0b096",
+     "frame": "047581a32f83680f007a1d0307a27d169d6ca476"
+    },
+    {
+     "at": 1800,
+     "state": "424368b8a951898cff8332b6c3d7300fe034ae36",
+     "frame": "047581a32f83680f007a1d0307a27d169d6ca476"
+    }
+   ],
+   "end": {
+    "state": "done",
+    "frame": 1803,
+    "score": 233
+   },
+   "rng": 0.17809549043886364
+  },
+  "S05": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "df1264951b2e7b227f8c17f159504ecfd27a9647",
+     "frame": "e6f74d2666c504cb39a6c6371614504472513032"
+    },
+    {
+     "at": 600,
+     "state": "ec1ce4ddd341282d0fe6c08345bc21348e22ba12",
+     "frame": "5e62b15e80448f876b05e44f65e05912753ebd2c"
+    },
+    {
+     "at": 900,
+     "state": "6a4f134bfc24a8f607ca03c44ebe7d1ce56503d4",
+     "frame": "b473236ba428209f95e9f13a273ecf22d7f5666a"
+    },
+    {
+     "at": 1200,
+     "state": "1daf9b7eceaaf727017b1af295cc6242d8655543",
+     "frame": "5334c619057188525ea91c568a4506fc68acacbc"
+    },
+    {
+     "at": 1500,
+     "state": "861077b45d1c001d8a6f44e205cee858a879227f",
+     "frame": "10ab2f65f12f37a5d2b50e75765223737dca7483"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1503,
+    "score": 0
+   },
+   "rng": 0.8008610436227173
+  },
+  "S06": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "33f46fc96573de86d12e21d3f27642f65d52665c",
+     "frame": "a491c4e0e94881ec4df1d21d1e9da881962d5205"
+    },
+    {
+     "at": 600,
+     "state": "38189a36d6d25026894dda9048ca8f120c9aad6b",
+     "frame": "27ccccc00d3277d135684cd52d3ea5c1f1990471"
+    },
+    {
+     "at": 900,
+     "state": "1110d2dad7985905aaf7ba83f0e33afa24205926",
+     "frame": "7543b64a82edb673a29af8bf40a089bcadc2155d"
+    },
+    {
+     "at": 1200,
+     "state": "59d43c0ebf42cd9423398c511c99d63fd6425eec",
+     "frame": "cfc185ae4b1644c35274971704f54a57f89c87a7"
+    },
+    {
+     "at": 1500,
+     "state": "a978a8bb67c0920c1c7d88599eee78f89a9b1cda",
+     "frame": "fde8f0800f5215f1e7d90dadc64ec8d32c464773"
+    },
+    {
+     "at": 1800,
+     "state": "abd7a9d48c7369e6048e821b24492450a2120127",
+     "frame": "1bf93dd304ab8e7df9cd79f0a14fbc89c8d34efb"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1813,
+    "score": 0
+   },
+   "rng": 0.2181501006707549
+  },
+  "S07": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "ae4efde5ebf532f5676b62d0259627a75d1f57f8",
+     "frame": "4a3e2acd9a350a7fdb5997ee2e1c1cf2baaaf592"
+    },
+    {
+     "at": 600,
+     "state": "499754daf2968f3100195aa579f1182807cac007",
+     "frame": "7be4d18cbb973d84a495174503cf074adc3a13d5"
+    },
+    {
+     "at": 900,
+     "state": "a3451002170b18ebf778590b0c1861035e6439e6",
+     "frame": "adfa952c63b2a24b180cefe67f19428d34b343ef"
+    },
+    {
+     "at": 1200,
+     "state": "4ae1be7895a10a89659c5120149d7ba3cd0eab71",
+     "frame": "01fce69b4344fca425229c70cfa5cb22bc1d6e86"
+    },
+    {
+     "at": 1500,
+     "state": "8fde8b97ee6cf5e8f69d32f94187920cf291f323",
+     "frame": "46e75975543e773b356a06eb4213c19049f46639"
+    },
+    {
+     "at": 1800,
+     "state": "114ea4df50c639901ad8acbccd5c6cb3a3e3a176",
+     "frame": "c5f790d3a61e182db9f271690826f869e1e215cb"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1804,
+    "score": 0
+   },
+   "rng": 0.6049706717021763
+  },
+  "S08": {
+   "checkpoints": [
+    {
+     "at": "registrata",
+     "state": "a34f95534ce8939c4904191a26ffd5a5a1259aed",
+     "frame": "f966f2ab071ca0959599ff6e3080b2c609260635"
+    },
+    {
+     "at": "replay",
+     "state": "a34f95534ce8939c4904191a26ffd5a5a1259aed",
+     "frame": "f966f2ab071ca0959599ff6e3080b2c609260635"
+    }
+   ],
+   "end": {
+    "state": "done",
+    "frame": 444,
+    "score": 100
+   },
+   "rng": 0.3195399693213403
+  }
+ }
+}

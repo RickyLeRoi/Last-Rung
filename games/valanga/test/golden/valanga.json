@@ -1,0 +1,325 @@
+{
+ "game": "valanga",
+ "scenarios": {
+  "V01": {
+   "checkpoints": [
+    {
+     "at": 240,
+     "state": "2106339ca4fa9144698aa62e7e70a75db29a16ea",
+     "frame": "1237c7c3e42739e045358e5cb1a2eedfa071b0d1"
+    }
+   ],
+   "end": {
+    "state": "title",
+    "frame": 240,
+    "score": 0
+   },
+   "rng": 0.6577616883441806
+  },
+  "V02": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "3a7b26ea54a2ddd5db185714d10bfdbd01014c5b",
+     "frame": "406353b7d2a4d916b863461bc8fce3a66ca2c5f7"
+    },
+    {
+     "at": 600,
+     "state": "40a2c44422a28aa0a5f8fa6327d95d15ea1f0bab",
+     "frame": "0ccb906d6e8c1846638e706466ec015bae3ee689"
+    },
+    {
+     "at": 900,
+     "state": "41d09ae8c2b90de8720940d3e31c6c7b9258c903",
+     "frame": "ba9ed254552c0fccc84a37b97e5123833726114b"
+    },
+    {
+     "at": 1200,
+     "state": "64fa26e3f9ad0b70c5863a57324f0b05b9df6ec1",
+     "frame": "c5b0fe5e7c1c2b5668e205648764db2db58298ea"
+    },
+    {
+     "at": 1500,
+     "state": "3a199acbcf2aacd9893c3f0050671ace99cdd5ca",
+     "frame": "745cae674b6db1a5a7c7ba5d41814d5351c89cc0"
+    },
+    {
+     "at": 1800,
+     "state": "c7de0e3a035a1400508a69b1c3ba827150166a5d",
+     "frame": "27df40f19696435a214a66aed16679aa3bd1359e"
+    },
+    {
+     "at": 2100,
+     "state": "509201254a457624736b978ddf565861c445aa27",
+     "frame": "ec6412c08b94cf195579fb233fb6ef9575c0f8be"
+    },
+    {
+     "at": 2400,
+     "state": "9ec953b1f07045be145fba741a9951e967618973",
+     "frame": "cf90373db1e83af446be06c1c9de0a86e77647f2"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.5479108972940594
+  },
+  "V03": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "46c856ff56d422b75713142f1e8e71a05bdd814c",
+     "frame": "27522af31cba74ad5ed86876df94cf78904d552a"
+    },
+    {
+     "at": 600,
+     "state": "471e123b09e70439ac3061a5e4fcc2aadb382714",
+     "frame": "418ebd2448acdbbbfaa735929fa12d5f72db2701"
+    },
+    {
+     "at": 900,
+     "state": "6681b31457148823ce549f6c2ceef49153ba58d6",
+     "frame": "403b14267160b5f54bc39913e9fb8cbb7099a859"
+    },
+    {
+     "at": 1200,
+     "state": "315b12b187fe2dfa5998cf09c775fdd9574a32a3",
+     "frame": "862580c3682105113609c695f43ace1015708f17"
+    },
+    {
+     "at": 1500,
+     "state": "29d22f181300056c574e50747a38ff5c9103cfdf",
+     "frame": "2326e027db34bfc1aa61b177221ca508da67470d"
+    },
+    {
+     "at": 1800,
+     "state": "33ffee2554b7777013859a293fd105403b8c2d0f",
+     "frame": "558068a481e8062d081c92bd7380c62b873afe5f"
+    },
+    {
+     "at": 2100,
+     "state": "4996fe4db35a6912d89ab27f158fc11d802fce29",
+     "frame": "b184a177e13303de1c03c40e935f936ae912c4c1"
+    },
+    {
+     "at": 2400,
+     "state": "d298de6ee892f607539b9ce7718b7febdcc5f1a1",
+     "frame": "ca967f6c5e862a9b37a69bbc1f28dbe3d0c06232"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.3568573866505176
+  },
+  "V04": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "87a261c0909fee4b58a2c4b9b554ee7d58d9fbb5",
+     "frame": "58ccf4dff0cd09268c8e611cbee234648d8aa4e7"
+    },
+    {
+     "at": 600,
+     "state": "43f754948dda2f6de90f297237b99e0bf515c391",
+     "frame": "63b2b5d918fd2e41e590c0abc464eea29f802367"
+    },
+    {
+     "at": 900,
+     "state": "b2a9c7781f3c69924b328df0b3f6e599dbe6f94c",
+     "frame": "6be01e8782d5f800c94e08797245a8ec112eb4fb"
+    },
+    {
+     "at": 1200,
+     "state": "15e2b6f550e264812ae5fa6d7b8ca2b85ec52fa4",
+     "frame": "ec8f8dc30a4ce8dbb7f7a411ba97605f735e9a82"
+    },
+    {
+     "at": 1500,
+     "state": "27fc36979e69e50b0abb962b53d43e56bfb823d4",
+     "frame": "84ac49a8ff8c8daf6c07fd8dd67adb17525a61be"
+    },
+    {
+     "at": 1800,
+     "state": "a79eb30c8ad765d679502f72cf08cc74daf7b4de",
+     "frame": "ebb30e2ded392595fbfab0f2d47a09796329c2a7"
+    },
+    {
+     "at": 2100,
+     "state": "b132da13442dfa30b5f20402b3878b1734972690",
+     "frame": "8dff821e726382dac26cc9a6e81aa0b333c125e8"
+    },
+    {
+     "at": 2400,
+     "state": "ec2d8fcfd712d2d26dc58f196b8028e01f2740ba",
+     "frame": "119ad2b806eb8b6d9775a75873e0f30f2e10c611"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 2403,
+    "score": 0
+   },
+   "rng": 0.5020027013961226
+  },
+  "V05": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "ee50eaf99166806c28ded8f96d5999e783bfb0ee",
+     "frame": "d1e6c07aad1bb8c275db773184c063e2fa47efaa"
+    },
+    {
+     "at": 600,
+     "state": "bea6762387e643edc2ad7f01dec88417458c4c0f",
+     "frame": "f3277ef5d0774e98581b7b43444de7745aac0f1a"
+    },
+    {
+     "at": 900,
+     "state": "d2a3cb8234a25ed39b6cc3019730a814150a3650",
+     "frame": "069e0370dbe31583d437832174610403845dd928"
+    },
+    {
+     "at": 1200,
+     "state": "1400ff8c59c2a52d10e5b5578fc030a67b672434",
+     "frame": "fdcf140d45f033c5adb8cedd6e75b6f471ee107a"
+    },
+    {
+     "at": 1500,
+     "state": "4678792d63d6e6ce18063c32c6cec3f3b0fea9ac",
+     "frame": "be9116afc3e82ea0badeec9fa283ddfe5d5d9b82"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1503,
+    "score": 0
+   },
+   "rng": 0.8158445341978222
+  },
+  "V06": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "9064d22070e65b249c00ac21270c77c35ee6bf8e",
+     "frame": "0157f17ecbb5fcdb1b4f26a26de1169cbdc40b70"
+    },
+    {
+     "at": 600,
+     "state": "2d6bb88bdcbc22a11e429ef0e7c8bdac00803fd6",
+     "frame": "fd7b0fdadc0b4045cef7f81189f5590bf0c39169"
+    },
+    {
+     "at": 900,
+     "state": "e6f12a10c1f619f321dd622f95efccfe90edde23",
+     "frame": "5c6500be6140ca08140e2cdcc682fbca4cf62c75"
+    },
+    {
+     "at": 1200,
+     "state": "543c08ccc233ab16a005467c912667f47ae0a69a",
+     "frame": "9f10a0ac1d871931c589dac8d23c40f7df36d490"
+    },
+    {
+     "at": 1500,
+     "state": "29e436d09d113a7948008d4a8ea182bbe2385a0f",
+     "frame": "a9df4b7afa6ed6e90b01290c51618a547ebb178d"
+    },
+    {
+     "at": 1800,
+     "state": "514dc49880b65e8645c3b6baa5873018911dd8cd",
+     "frame": "cdd45ecfa6dc43d6b789c19f2562e0da9f897685"
+    }
+   ],
+   "end": {
+    "state": "play",
+    "frame": 1803,
+    "score": 0
+   },
+   "rng": 0.9426542180590332
+  },
+  "V07": {
+   "checkpoints": [
+    {
+     "at": 300,
+     "state": "986dd5f7b62110b23ca267e2f774ff92bc549ed4",
+     "frame": "f03bd9b8f875aac1a05293b1c5c26e4d69677a70"
+    },
+    {
+     "at": 600,
+     "state": "34c971ae3788fd01b406bd8e73fb788cf02957bc",
+     "frame": "09e97d433037dd9e617ead051a6dc8f358461af6"
+    },
+    {
+     "at": 900,
+     "state": "948a50a732119ee6192e180ad739667564075e47",
+     "frame": "3b19e24998676fe919d90a072a7f1ed6c9138cab"
+    },
+    {
+     "at": 1200,
+     "state": "1c5cada372b26a1099b3279701481d2159747880",
+     "frame": "f19205d0de06149c57a3d4d64d53dec145ead3af"
+    },
+    {
+     "at": 1500,
+     "state": "15e10ed71c182aa62986d86d2fc4247d6fdef98f",
+     "frame": "76e24d250e77a215436223360214f0c536071941"
+    },
+    {
+     "at": 1800,
+     "state": "f4afcf123d19756328ce93b2c82f2c4cdbb81a94",
+     "frame": "76e24d250e77a215436223360214f0c536071941"
+    },
+    {
+     "at": 2100,
+     "state": "a13409237ed0a2cb39d8154bd369c2b1de7c362a",
+     "frame": "f19205d0de06149c57a3d4d64d53dec145ead3af"
+    },
+    {
+     "at": 2400,
+     "state": "5454665cb5dea1393b5814a8dac76a961fb186fa",
+     "frame": "f19205d0de06149c57a3d4d64d53dec145ead3af"
+    },
+    {
+     "at": 2700,
+     "state": "7fa28735a91807a1d8057bbd01e0f5b9e8abe2ee",
+     "frame": "76e24d250e77a215436223360214f0c536071941"
+    },
+    {
+     "at": 3000,
+     "state": "7aa1c3e743e049554b0e61ee9346cc1ae8cd6369",
+     "frame": "f19205d0de06149c57a3d4d64d53dec145ead3af"
+    }
+   ],
+   "end": {
+    "state": "done",
+    "frame": 3001,
+    "score": 1210
+   },
+   "rng": 0.0020066937431693077
+  },
+  "V08": {
+   "checkpoints": [
+    {
+     "at": "registrata",
+     "state": "80dbd6d21cabc68f41b9fbfe0c16c4038901e0a6",
+     "frame": "ba292889cabda9821c2b8c45061d7a8837e68d68"
+    },
+    {
+     "at": "replay",
+     "state": "80dbd6d21cabc68f41b9fbfe0c16c4038901e0a6",
+     "frame": "daab8c7f7e24461ccbb09883d25611be9e77e79c"
+    }
+   ],
+   "end": {
+    "state": "replay",
+    "frame": 1503,
+    "score": 0
+   },
+   "rng": 0.7791092288680375
+  }
+ }
+}
