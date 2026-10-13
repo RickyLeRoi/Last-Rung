@@ -25,7 +25,7 @@ function updateQueen() {
   game.layT += level.broodSpeed;
   if (game.layT < broodConfig.layEvery) return;
   // Food is kept for the larvae already there: a new egg only when the stock covers it and half of what they still need.
-  const stillHungry = game.brood.reduce((sum, item) => sum + (item.stage === 'pupa' ? 0 : 2 - item.fed), 0);
+  const stillHungry = game.brood.reduce((sum, item) => sum + (item.stage === 'pupa' ? 0 : broodConfig.larvaMeals - item.fed), 0);
   if (game.stock < 1 + Math.ceil(stillHungry / 2) || population() + game.brood.length >= CONFIG.ants.max) return;
   const home = nurseries().find(nursery => game.brood.filter(item => item.chamber === nursery).length < nurseryRoom(nursery));
   if (!home) return;
@@ -35,12 +35,12 @@ function updateQueen() {
   game.brood.push({ stage: 'egg', t: 0, fed: 0, chamber: home, slot });
 }
 
-// A larva eats twice (when it hatches and half way); without food it waits.
+// A larva eats larvaMeals times, evenly spread from its hatching; without food it waits.
 function updateBrood() {
   const level = game.L, broodConfig = CONFIG.brood, speed = level.broodSpeed;
   for (const item of game.brood) {
     if (isUnderWater(item.chamber.x, item.chamber.y + item.chamber.r - 3)) { item.drowned = true; continue; }
-    if (item.stage === 'larva' && item.fed < 2 && item.t >= (item.fed === 0 ? 0 : broodConfig.larva / 2)) {
+    if (item.stage === 'larva' && item.fed < broodConfig.larvaMeals && item.t >= item.fed * broodConfig.larva / broodConfig.larvaMeals) {
       if (game.stock < 1) continue;
       game.stock--; item.fed++;
     }

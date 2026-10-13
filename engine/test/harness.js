@@ -58,7 +58,7 @@ function loadSnapshotFunction(gameId) {
   return fs.existsSync(file) ? require(file) : null;
 }
 
-// options: { game (id, default 'last-rung'), seededMath, search, gamepad }
+// options: { game (id, default 'last-rung'), seededMath, search, gamepad, skipRender (no drawing except for frameHash and shot) }
 function boot(options = {}) {
   const gameId = options.game || 'last-rung';
   const source = loadSource(gameId);
@@ -107,6 +107,7 @@ function boot(options = {}) {
     performance: { now: () => now },
     requestAnimationFrame: callback => { animationFrameCallback = callback; },
     __TEST_HOOK__: testHook => { hook = testHook; },
+    __SKIP_RENDER__: () => !!options.skipRender && !capture,
   };
   if (seededMath) sandbox.Math = Object.assign(Object.create(Math), { random: seededMath.next });
   new Function(...Object.keys(sandbox), source)(...Object.values(sandbox));

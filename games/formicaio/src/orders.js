@@ -11,7 +11,8 @@ function chamberAt(x, y) {
   return game.L.chambers.find(chamber => (x - chamber.x) ** 2 + (y - chamber.y) ** 2 <= chamber.r * chamber.r) || null;
 }
 
-// One cell of trail: solid soil under the grass becomes a dig order, open ground gets fresh pheromone.
+// One cell of trail: solid soil under the grass becomes a dig order; in the open the pheromone goes on the first walkable cell at or
+// below the cursor (a trail in the air above the grass would lead nowhere).
 function paintCell(cellX, cellY) {
   const level = game.L;
   if (!inGrid(cellX, cellY)) return;
@@ -20,7 +21,12 @@ function paintCell(cellX, cellY) {
     if (isUnderground(cellY) && DIGGABLE.has(material) && !level.digOrder[index]) { level.digOrder[index] = 1; level.fieldsDirty = true; }
     return;
   }
-  level.pheromone[index] = 1;
+  for (let below = cellY; below < cellY + 6 && inGrid(cellX, below); below++) {
+    if (!isWalkable(cellX, below)) continue;
+    level.pheromone[gridIndex(cellX, below)] = 1;
+    level.fieldsDirty = true;
+    return;
+  }
 }
 
 function paintTrail() {
@@ -67,9 +73,12 @@ function togglePlug() {
 function updateCursor(input) {
   const level = game.L, cursor = game.cursor, speed = CONFIG.cursor.speed;
   if (input.hx || input.up || input.down) game.used.move = true;
+  const painting = input.trail > 0.5;
+  // The trail starts where the button is pressed, before the cursor moves.
+  if (painting && !cursor.painting) paintTrail();
   cursor.x = clamp(cursor.x + input.hx * speed, 0, level.width - 1);
   cursor.y = clamp(cursor.y + (input.down - input.up) * speed, 0, level.height - 1);
-  if (input.trail > 0.5) { paintTrail(); game.used.trail = true; } else cursor.painting = false;
+  if (painting) { paintTrail(); game.used.trail = true; } else cursor.painting = false;
   if (input.chamber) markChamber();
   if (input.plug) togglePlug();
   if (input.recall) {
@@ -79,21 +88,15 @@ function updateCursor(input) {
   }
 }
 
-// Surface trails fade unless foragers carrying food walk them again; food near a fresh trail is known to the colony.
+// Surface trails fade unless foragers carrying food walk them again.
 function updatePheromone() {
   const level = game.L, pheromone = level.pheromone, decay = level.trailDecay;
   for (let i = 0; i < pheromone.length; i++) if (pheromone[i] > 0) pheromone[i] = Math.max(0, pheromone[i] - decay);
 }
 
+// Food is known once a scout has smelled it (ants.js).
 function updateKnownFood() {
-  const level = game.L, range = CONFIG.trail.knownRange, threshold = CONFIG.trail.known;
-  level.knownFood = level.foods.filter(food => {
-    const foodCellX = cellOf(food.x), foodCellY = cellOf(foodY(food));
-    for (let cellY = foodCellY - range; cellY <= foodCellY + range; cellY++) {
-      for (let cellX = foodCellX - range; cellX <= foodCellX + range; cellX++) if (inGrid(cellX, cellY) && level.pheromone[gridIndex(cellX, cellY)] >= threshold) return true;
-    }
-    return false;
-  });
+  game.L.knownFood = game.L.foods.filter(food => food.found);
 }
 
 function updateChambers() {

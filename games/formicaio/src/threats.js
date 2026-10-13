@@ -1,6 +1,6 @@
 // games/formicaio/src/threats.js
 'use strict';
-// Spiders hunt on the grass: an isolated ant (no other one nearby) is eaten, a group chases the spider away. Showers flood open holes.
+// Spiders hunt on the grass: an isolated ant (no other one nearby) is eaten, two or more chase the spider away. Showers flood open holes.
 
 // Above the local grass (the meadow is not flat), and never deeper than the mouth of a hole.
 const isOnGrass = ant => cellCenter(ant.cellY) < Math.min(surfaceAt(cellCenter(ant.cellX)), game.L.groundY + 4);

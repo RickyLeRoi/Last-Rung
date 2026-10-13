@@ -3,11 +3,11 @@
 /*
  * The ants' coarse grid over the terrain mask. A cell is free when the pixel at its centre is empty; above the original ground line
  * it is also walkable only with solid ground under it (ants walk on the grass and on the mound, they do not fly).
- * Distance fields (breadth-first, 4 neighbours) lead the ants: one per goal, recomputed every few frames.
+ * Distance fields lead the ants: one per goal, recomputed every few frames. A step costs 1 under ground and on a fresh trail,
+ * more on open grass: a trail drawn by the player (or left by the foragers) is the path the ants prefer.
  */
 const CELL = CONFIG.cell;
 const NO_PATH = 32767;
-const FIELD_NAMES = ['home', 'dig', 'food', 'exit', 'plug'];
 
 const cellOf = pixel => Math.floor(pixel / CELL);
 const cellCenter = index => index * CELL + CELL / 2;
@@ -16,10 +16,14 @@ const inGrid = (cellX, cellY) => cellX >= 0 && cellY >= 0 && cellX < game.L.grid
 const cellMaterial = (cellX, cellY) => Terrain.get(game.L.terrain, cellCenter(cellX), cellCenter(cellY));
 const isUnderground = cellY => cellCenter(cellY) >= game.L.groundY;
 
+// Outside the mask the terrain reads as solid (255): it bounds the world but is no ground to stand on.
 function isWalkable(cellX, cellY) {
   if (!inGrid(cellX, cellY) || cellMaterial(cellX, cellY) !== 0) return false;
   if (isUnderground(cellY)) return true;
-  for (let deltaX = -1; deltaX <= 1; deltaX++) if (cellMaterial(cellX + deltaX, cellY + 1) !== 0) return true;
+  for (let deltaX = -1; deltaX <= 1; deltaX++) {
+    const below = cellMaterial(cellX + deltaX, cellY + 1);
+    if (below !== 0 && below !== 255) return true;
+  }
   return false;
 }
 
@@ -32,21 +36,40 @@ function walkableGrid() {
   return walkable;
 }
 
-function computeField(sources, walkable) {
-  const level = game.L, width = level.gridWidth, field = new Int16Array(width * level.gridHeight).fill(NO_PATH), queue = [];
+const isFreshTrail = index => game.L.pheromone[index] >= CONFIG.trail.known;
+
+// Cost of stepping into each cell: open grass costs more than galleries and trails.
+function stepCosts(walkable) {
+  const level = game.L, width = level.gridWidth, costs = new Uint8Array(walkable.length);
+  for (let index = 0; index < costs.length; index++) {
+    if (!walkable[index]) continue;
+    costs[index] = isUnderground(Math.floor(index / width)) || isFreshTrail(index) ? 1 : CONFIG.trail.offTrailCost;
+  }
+  return costs;
+}
+
+// Shortest paths with small integer costs (one bucket per distance).
+function computeField(sources, walkable, costs) {
+  const level = game.L, width = level.gridWidth, field = new Int16Array(width * level.gridHeight).fill(NO_PATH), buckets = [[]];
   for (const [cellX, cellY] of sources) {
     const index = gridIndex(cellX, cellY);
-    if (field[index] === NO_PATH) { field[index] = 0; queue.push(cellX, cellY); }
+    if (field[index] === NO_PATH) { field[index] = 0; buckets[0].push(index); }
   }
-  for (let head = 0; head < queue.length; head += 2) {
-    const cellX = queue[head], cellY = queue[head + 1], distance = field[gridIndex(cellX, cellY)] + 1;
-    for (const [deltaX, deltaY] of NEIGHBOURS) {
-      const nextX = cellX + deltaX, nextY = cellY + deltaY;
-      if (nextX < 0 || nextY < 0 || nextX >= width || nextY >= level.gridHeight) continue;
-      const index = nextY * width + nextX;
-      if (!walkable[index] || field[index] !== NO_PATH) continue;
-      field[index] = distance;
-      queue.push(nextX, nextY);
+  for (let distance = 0; distance < buckets.length; distance++) {
+    const bucket = buckets[distance];
+    if (!bucket) continue;
+    for (let i = 0; i < bucket.length; i++) {
+      const index = bucket[i];
+      if (field[index] !== distance) continue;
+      const cellX = index % width, cellY = (index - cellX) / width;
+      for (const [deltaX, deltaY] of NEIGHBOURS) {
+        const nextX = cellX + deltaX, nextY = cellY + deltaY;
+        if (nextX < 0 || nextY < 0 || nextX >= width || nextY >= level.gridHeight) continue;
+        const next = nextY * width + nextX, nextDistance = distance + costs[next];
+        if (!walkable[next] || nextDistance >= field[next]) continue;
+        field[next] = nextDistance;
+        (buckets[nextDistance] = buckets[nextDistance] || []).push(next);
+      }
     }
   }
   return field;
@@ -96,13 +119,13 @@ function updateFields() {
   // The plug cell itself is still open: the ant stands in it or next to it and fills it from there.
   const plugSources = [];
   for (const plug of level.plugs) if (isWalkable(plug.cellX, plug.cellY)) plugSources.push([plug.cellX, plug.cellY]);
-  const walkable = walkableGrid();
+  const walkable = walkableGrid(), costs = stepCosts(walkable);
   level.fields = {
-    home: computeField(homeSources, walkable),
-    dig: computeField(digFront(walkable), walkable),
-    food: computeField(foodSources, walkable),
-    exit: computeField(exitSources, walkable),
-    plug: computeField(plugSources, walkable),
+    home: computeField(homeSources, walkable, costs),
+    dig: computeField(digFront(walkable), walkable, costs),
+    food: computeField(foodSources, walkable, costs),
+    exit: computeField(exitSources, walkable, costs),
+    plug: computeField(plugSources, walkable, costs),
   };
 }
 

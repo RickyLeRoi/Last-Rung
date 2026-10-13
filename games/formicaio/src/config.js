@@ -20,24 +20,25 @@ const CONFIG = {
   cursor: { speed: 2.2, startDepth: 16 },
   trail: {
     decay: 1 / 1800, droughtDecay: 1 / 900,   // pheromone lost per frame on the surface (1 = fresh)
-    known: 0.2,                               // food within knownRange cells of a trail at least this fresh is known to the foragers
-    knownRange: 3,
+    known: 0.2,                               // a trail at least this fresh is followed by the scouts and is the cheap path
+    offTrailCost: 3,                          // a step on open grass costs this much (1 on a trail and under ground)
     reinforce: 1,                             // a forager carrying food refreshes the trail under it
   },
+  scout: { smell: 28, trailReach: 3, turnChance: 0.01, giveUp: 2400, keep: 1 },   // smell: px; trailReach: cells; keep: scouts left looking while food is known
   dig: { frames: 22, radius: 2.6 },
   chamber: { radius: 10, max: 6, complete: 0.8, nurseryCap: 8, pantryCap: 30, queenCap: 3, baseStock: 12 },
   ants: {
     start: 4, max: 80,
     stepFrames: 4, carryStepFrames: 5, heavyStepFrames: 8,    // frames per cell
-    diggerShare: 0.5, foragerShare: 0.6, pluggers: 3, minCrew: 2,
+    foragerShare: 0.6, pluggers: 3,                           // foragerShare: the forager caste among the workers
     rethink: 60, fieldEvery: 10, drown: 120,
   },
-  brood: { layEvery: 240, egg: 360, larva: 600, pupa: 360, tutorialSpeed: 3 },
+  brood: { layEvery: 240, egg: 360, larva: 600, pupa: 360, larvaMeals: 1, tutorialSpeed: 3 },   // an egg costs 1 food, a larva 1 per meal
   food: { seed: 3, crumb: 5, insect: 12, firstCount: 3, droughtFirstCount: 2, every: 900, droughtEvery: 1100, minDistance: 40, nearDistance: 220 },
   season: { frames: 14400, perLoop: 600, min: 10800 },
   target: { base: 14, perLoop: 2, max: 40, tutorial: 8, threeStars: 1.5 },
-  spider: { speed: 0.3, perLoop: 0.05, catchRadius: 6, group: 4, groupRange: 14, scared: 240, eatEvery: 1800, margin: 16 },   // eatEvery: full after a catch
-  rain: { warning: 360, duration: 900, gap: 2100, gapPerLoop: 150, minGap: 1200, firstAt: 3000, dropEvery: 16, absorb: 0.004, queenDrown: 90 },
+  spider: { speed: 0.3, perLoop: 0.05, catchRadius: 6, group: 2, groupRange: 14, scared: 240, eatEvery: 1800, margin: 16 },   // eatEvery: full after a catch
+  rain: { warning: 360, duration: 720, gap: 2100, gapPerLoop: 150, minGap: 1200, firstAt: 3000, dropEvery: 16, absorb: 0.004, queenDrown: 90 },
   score: { worker: 10, food: 1, starBonus: [0, 0, 100, 250] },
   // backdrop above the meadow (world px): tops between groundY - lowest - amplitude and groundY - lowest
   backdrop: {

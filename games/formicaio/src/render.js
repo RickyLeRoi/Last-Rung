@@ -138,9 +138,9 @@ function drawOverlay() {
       ['LEVETTA : CURSORE    TRACCIA (TIENI) : PISTA', 'CAMERA    RICHIAMA    TAPPA', 'II : PAUSA     AUDIO : SUONO SI/NO'],
       ['LEVETTA / CROCE : CURSORE    A (TIENI) : PISTA', 'X : CAMERA    B : RICHIAMA    RB : TAPPA', 'START PAUSA  BACK RICOMINCIA  Y REPLAY']);
     const rules = [
-      'PISTA SOTTO TERRA: LE OPERAIE SCAVANO. SULL ERBA: TROVANO IL CIBO',
+      'PISTA SOTTO TERRA: LE OPERAIE SCAVANO. SULL ERBA: LA STRADA DA FARE',
       'IL CIBO DIVENTA UOVA, LARVE E OPERAIE. SERVONO NURSERY',
-      'IL RAGNO MANGIA LE ISOLATE. LA PIOGGIA ALLAGA LE GALLERIE',
+      'LE RACCOGLITRICI CERCANO IL CIBO. IL RAGNO MANGIA LE ISOLATE',
     ];
     controls.concat([''], rules).forEach((line, i) => text(line, SCREEN_WIDTH / 2, 58 + i * 9, 1, 'c'));
     if (blink) text(hint('INVIO: GIOCA     G: SFIDA DEL GIORNO', 'TOCCA PER GIOCARE', 'A: GIOCA     Y: SFIDA DEL GIORNO'), SCREEN_WIDTH / 2, SCREEN_HEIGHT - 30, 1, 'c');
@@ -148,7 +148,7 @@ function drawOverlay() {
     const notes = [];
     if (level.rainy) notes.push('TEMPORALI: ' + level.showers.length + ' IN ARRIVO');
     if (level.drought) notes.push('SICCITA: PISTE CHE SVANISCONO IN FRETTA');
-    if (level.spiders.length) notes.push('RAGNI: ' + level.spiders.length + '. IN GRUPPO LI SCACCIATE');
+    if (level.spiders.length) notes.push('RAGNI: ' + level.spiders.length + '. IN DUE LI SCACCIATE');
     notes.push('OBIETTIVO: ' + level.target + ' OPERAIE' + (level.season === Infinity ? '' : '   STAGIONE: ' + Math.round(level.season / 3600) + ' MINUTI'));
     const promptY = 100 + notes.length * 9 + 6;
     drawPanel(40, 46, SCREEN_WIDTH - 80, promptY - 46 + 16);

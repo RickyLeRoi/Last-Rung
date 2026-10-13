@@ -19,6 +19,7 @@ const Sfx = (() => {
     trail()    { tone(1400, 1700, 0.03, 'triangle', 0.03); },
     dig()      { noise(0.05, 'bandpass', 2400, 1600, 0.05); },
     food()     { tone(880, 1320, 0.05, 'triangle', 0.05); },
+    found()    { [990, 1320, 1760].forEach((frequency, i) => tone(frequency, frequency, 0.06, 'triangle', 0.06, i * 0.06)); },
     born()     { tone(1200, 1800, 0.08, 'triangle', 0.07); tone(1800, 2400, 0.06, 'triangle', 0.05, 0.08); },
     chamber()  { [523, 784].forEach((frequency, i) => tone(frequency, frequency, 0.1, 'triangle', 0.08, i * 0.09)); },
     plug()     { noise(0.12, 'lowpass', 900, 300, 0.12); },

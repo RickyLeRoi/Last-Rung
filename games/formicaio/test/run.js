@@ -71,21 +71,37 @@ test('pista sotto terra: ordini di scavo, la galleria si apre e il cumulo cresce
   return 'scavate ' + level.dug + ', cumulo ' + level.moundCells;
 });
 
-test("pista sull'erba: il cibo vicino diventa noto, le operaie lo portano nel nido; senza rinforzo la pista svanisce", () => {
+test('raccoglitrici: meta della colonia, trovano il cibo da sole e lo portano al nido; senza rinforzo le piste svaniscono', () => {
   const { harness, game, hook } = setup();
-  const level = game.L, food = level.foods[0], direction = Math.sign(food.x - level.entranceX);
-  moveCursor(harness, level.entranceX + direction * 8, level.groundY - 3, false);
-  moveCursor(harness, food.x, hook.surfaceAt(food.x) - 3, true);
-  harness.tick(hook.CONFIG.ants.fieldEvery);
-  assert(level.knownFood.includes(food), 'il cibo non e noto');
-  harness.tick(1500);
+  const level = game.L;
+  const foragers = game.ants.filter(ant => ant.caste === 'forager').length;
+  assert(foragers === Math.ceil(game.ants.length * hook.CONFIG.ants.foragerShare), 'raccoglitrici iniziali: ' + foragers);
+  for (let i = 0; i < 3000 && !level.delivered; i++) harness.tick();
+  assert(level.foods.some(food => food.found) || level.delivered > 0, 'nessun cibo trovato');
   assert(level.delivered > 0, 'nessuna consegna');
+  assert(game.ants.every(ant => ant.caste === 'forager' || (ant.job !== 'forage' && ant.job !== 'scout')), 'una operaia e andata a cercare cibo');
   const decay = level.trailDecay;
   level.foods.length = 0;
   game.ants.forEach(ant => { ant.carry = null; });
   harness.tick(Math.ceil((1 - hook.CONFIG.trail.known) / decay) + 30);
   assert(level.pheromone.every(value => value < hook.CONFIG.trail.known), 'la pista non svanisce');
   return 'consegnati ' + level.delivered;
+});
+
+test("pista sull'erba: non rivela il cibo, ma manda le esploratrici dove porta (il cibo lontano prima di quello vicino)", () => {
+  const { harness, game, hook } = setup();
+  const level = game.L, near = level.entranceX - 70, far = level.entranceX + 170;
+  level.foods.length = 0;
+  level.foods.push({ x: near, kind: 'seed', amount: 3 }, { x: far, kind: 'seed', amount: 3 });
+  harness.tap('KeyZ');
+  moveCursor(harness, level.entranceX + 4, level.groundY - 3, false);
+  moveCursor(harness, far, hook.surfaceAt(far) - 3, true);
+  assert(!level.foods.some(food => food.found), 'la pista ha rivelato il cibo');
+  harness.tap('KeyZ');
+  for (let i = 0; i < 3000 && !level.foods.some(food => food.found); i++) harness.tick();
+  const found = level.foods.filter(food => food.found);
+  assert(found.length === 1 && found[0].x === far, 'trovato per primo: ' + found.map(food => food.x).join(',') + ' (lontano ' + far + ', vicino ' + near + ')');
+  return 'trovato al frame ' + game.frame;
 });
 
 test('camere: una camera scavata si completa; la dispensa alza le scorte; la nursery ospita la covata', () => {
@@ -105,7 +121,7 @@ test('camere: una camera scavata si completa; la dispensa alza le scorte; la nur
   return 'completa al frame ' + game.frame;
 });
 
-test('covata: uovo, larva (mangia due volte), pupa e operaia nei tempi del config; senza posto o senza cibo si ferma', () => {
+test('covata: uovo, larva (mangia), pupa e operaia nei tempi del config; senza posto o senza cibo si ferma', () => {
   const { harness, game, hook } = setup();
   const brood = hook.CONFIG.brood, level = game.L;
   game.ants.forEach(ant => { ant.job = 'home'; });
@@ -118,10 +134,11 @@ test('covata: uovo, larva (mangia due volte), pupa e operaia nei tempi del confi
   assert(egg.stage === 'larva', 'dopo ' + brood.egg + ' frame: ' + egg.stage);
   harness.tick(1);
   assert(egg.fed === 1, 'la larva non mangia alla schiusa');
+  const starving = { stage: 'larva', t: 0, fed: 0, chamber: level.queenChamber, slot: 2 };
+  game.brood.push(starving);
   game.stock = 0;
-  const waiting = egg.t;
   harness.tick(brood.larva);
-  assert(egg.fed === 1 && egg.t <= Math.max(waiting, brood.larva / 2), 'la larva cresce senza cibo (t=' + egg.t + ')');
+  assert(starving.fed === 0 && starving.t === 0, 'la larva cresce senza cibo (t=' + starving.t + ')');
   game.stock = 10;
   harness.tick(brood.larva + brood.pupa + 5);
   const before = hook.CONFIG.ants.start;
@@ -134,7 +151,7 @@ test('covata: uovo, larva (mangia due volte), pupa e operaia nei tempi del confi
   return 'nate ' + level.born;
 });
 
-test('ragno: mangia la formica isolata, un gruppo lo scaccia, sotto terra non arriva', () => {
+test('ragno: mangia la formica isolata, due formiche lo scacciano, sotto terra non arriva', () => {
   const { harness, game, hook } = setup();
   const level = game.L, x = level.entranceX + 120;
   level.spiders = [{ x, dir: 1, speed: 0, scaredT: 0, eatT: 0 }];
@@ -145,9 +162,9 @@ test('ragno: mangia la formica isolata, un gruppo lo scaccia, sotto terra non ar
   harness.tick(2);
   assert(!game.ants.includes(lone) && level.lostAnts === 1, 'la formica isolata non e stata mangiata');
   level.spiders[0].eatT = 0;
-  for (let i = 0; i < 4; i++) { const ant = hook.spawnAnt(x - 6 + i * 4, hook.surfaceAt(x) - 2); ant.job = 'home'; ant.t = 1000; }
+  for (let i = 0; i < 2; i++) { const ant = hook.spawnAnt(x - 2 + i * 4, hook.surfaceAt(x) - 2); ant.job = 'home'; ant.t = 1000; }
   harness.tick(2);
-  assert(level.spiders[0].scaredT > 0 && level.lostAnts === 1, 'il gruppo non scaccia il ragno');
+  assert(level.spiders[0].scaredT > 0 && level.lostAnts === 1, 'due formiche non scacciano il ragno');
   const deep = hook.spawnAnt(level.queenChamber.x, level.queenChamber.y);
   level.spiders[0] = { x: level.queenChamber.x, dir: 1, speed: 0, scaredT: 0, eatT: 0 };
   deep.t = 1000;
@@ -196,17 +213,16 @@ test('sabbia: crolla nella galleria scavata sotto; una formica sotto la frana vi
   return alive ? 'spinta fuori' : 'persa sotto la frana';
 });
 
-test('richiamo: niente nuove raccoglitrici finche e attivo; si spegne con lo stesso tasto', () => {
-  const { harness, game, hook } = setup();
-  const level = game.L, food = level.foods[0];
+test('richiamo: le raccoglitrici restano nel nido finche e attivo; si spegne con lo stesso tasto', () => {
+  const { harness, game } = setup();
+  const busy = ant => (ant.job === 'forage' || ant.job === 'scout') && !ant.carry;
   harness.tap('KeyZ');
   assert(game.recall, 'Z non attiva il richiamo');
-  for (let cellX = hook.cellOf(Math.min(food.x, level.entranceX)); cellX <= hook.cellOf(Math.max(food.x, level.entranceX)); cellX++) level.pheromone[hook.gridIndex(cellX, hook.cellOf(level.groundY - 3))] = 1;
   harness.tick(600);
-  assert(!game.ants.some(ant => ant.job === 'forage' && !ant.carry), 'raccoglitrici al lavoro durante il richiamo');
+  assert(!game.ants.some(busy), 'raccoglitrici fuori durante il richiamo');
   harness.tap('KeyZ');
   harness.tick(300);
-  assert(!game.recall && game.ants.some(ant => ant.job === 'forage'), 'nessuna raccoglitrice dopo il richiamo');
+  assert(!game.recall && game.ants.some(busy), 'nessuna raccoglitrice al lavoro dopo il richiamo');
 });
 
 test("fine: a fine stagione vince solo con l'obiettivo, le stelle seguono le regole; colonia estinta = game over", () => {

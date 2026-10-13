@@ -1,8 +1,9 @@
 // games/formicaio/test/autopilot.js
 'use strict';
 // Scripted player shared by levels.js (solvability) and the rules suite. Keyboard only, like a player; it reads the state to plan.
-// It digs a nursery next to the queen, lays a trail on the grass to every food it does not know yet (nearest first), adds a pantry
-// and a second nursery as the colony grows and, before a shower, recalls the ants and plugs the entrance (then reopens it).
+// It digs a nursery next to the queen, adds a pantry and a second nursery as the colony grows, steers the scouts with a trail on the
+// grass towards the nearest food they have not found yet (once per food, away from spiders) and, before a shower, recalls the ants
+// and plugs the entrance (then reopens it). The foragers find and carry the food on their own.
 const { boot } = require('./helpers');
 
 const REACHED = 1.2;          // px: the cursor moves 2.2 px per frame per axis
@@ -33,17 +34,18 @@ function chamberStroke(hook) {
   return null;
 }
 
-// Along the grass, starting beside the entrance hole (never down the hole, or the cursor would order a dig through the soil).
+// Along the grass, starting at the edge of the entrance hole (so the scouts coming out step on it; never down the hole, or the
+// cursor would order a dig through the soil).
 function surfaceStroke(hook, fromX, toX) {
   const groundY = hook.game.L.groundY, grassY = x => Math.min(hook.surfaceAt(x), groundY + 1) - 3;
   const points = [], direction = Math.sign(toX - fromX) || 1;
-  for (let x = fromX + direction * 8; direction > 0 ? x < toX : x > toX; x += direction * 6) points.push([x, grassY(x)]);
+  for (let x = fromX + direction * 4; direction > 0 ? x < toX : x > toX; x += direction * 6) points.push([x, grassY(x)]);
   points.push([toX, grassY(toX)]);
   return { points, trail: true, tap: null };
 }
 
 function createPlanner(hook) {
-  const plan = { queue: [], nurseries: 0, pantry: false, handledShower: -1, reopenShower: -1, tapNext: null };
+  const plan = { queue: [], nurseries: 0, pantry: false, handledShower: -1, reopenShower: -1, steered: new Set() };
   const level = () => hook.game.L;
 
   function rainStrokes(game) {
@@ -83,8 +85,10 @@ function createPlanner(hook) {
     if (raining) return;
     // Nearest first, but food close to a spider costs as much as food far away: isolated foragers get eaten there.
     const cost = food => Math.abs(food.x - L.entranceX) + (L.spiders.some(spider => Math.abs(spider.x - food.x) < 100) ? 300 : 0);
-    const unknown = L.foods.filter(food => !L.knownFood.includes(food)).sort((first, second) => cost(first) - cost(second));
-    if (unknown.length) plan.queue.push(surfaceStroke(hook, L.entranceX, unknown[0].x));
+    const unknown = L.foods.filter(food => !food.found && !plan.steered.has(food)).sort((first, second) => cost(first) - cost(second));
+    if (!unknown.length) return;
+    plan.steered.add(unknown[0]);
+    plan.queue.push(surfaceStroke(hook, L.entranceX, unknown[0].x));
   }
 
   // Keys for this frame: { keys, space, tap }.
@@ -112,7 +116,7 @@ function createPlanner(hook) {
 
 // Plays one level to its end; returns { state, result, stars, workers, target, frames, driver }.
 function playLevel(spec, limit = 30000) {
-  const driver = boot({ seededMath: 1 });
+  const driver = boot({ seededMath: 1, skipRender: true });
   const hook = driver.hook, game = hook.game;
   driver.play(spec);
   const decide = createPlanner(hook);
