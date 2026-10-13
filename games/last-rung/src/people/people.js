@@ -103,15 +103,13 @@ function updatePeople() {
         else if (person.injured) showMessage("FERITO: NON SI AGGRAPPA. ATTERRA O CALA IL VERRICELLO SUL SUO TETTO", 90);
         else if (heli.att.length < CONFIG.rescue.ladderSlots) attach(person);
         else showMessage('SCALETTA OCCUPATA: ATTENDI CHE SALGANO', 60);
-      } else if (speed > speedLimits.crushLadder) {
-        if (hook === ladderHitboxes.hook) stainHeli(hook, personBox);
-        killPerson(person, "TRAVOLTO: VELOCITA' TROPPO ALTA", true);
       } else {
+        // 20261013 ** RG #ladder_never_kills: too fast only means no hook
         showMessage('RALLENTA! TROPPO VELOCE PER AGGANCIARE', 60);
       }
       continue;
     }
-    if (speed > speedLimits.crushLadder && overlap(ladderHitboxes.rope, personBox)) { stainHeli(ladderHitboxes.rope, personBox); killPerson(person, 'TRAVOLTO DALLA SCALETTA', true); continue; }
+    // 20261013 -- RG
     for (const partName of ['cabin', 'boom', 'skid']) {
       if (overlap(heliHitboxes[partName], personBox) && speed > speedLimits.crushBody) { stainHeli(heliHitboxes[partName], personBox); killPerson(person, "TRAVOLTO DALL'ELICOTTERO", true); break; }
     }

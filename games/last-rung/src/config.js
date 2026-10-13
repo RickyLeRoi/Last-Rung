@@ -29,7 +29,7 @@ const CONFIG = (() => {
     load: { max: 8, minSpeedFactor: 0.3 },     // 8 aboard -> 30% of top speed
     speed: {
       hook,                  // hooking: max 20% of top speed
-      crushLadder: topSpeed * 0.5,  // above: the ladder crushes
+      crushLadder: topSpeed * 0.5,  // above: the bucket crushes and nobody jumps onto the ladder (the ladder itself never kills)
       crushBody: topSpeed * 0.3,    // above: the fuselage crushes
       land: topSpeed * 0.5,         // landing: max vertical speed
       landH: topSpeed * 0.35,       // landing: max horizontal speed

@@ -29,7 +29,7 @@ Parametri URL: `?livello=N` parte dal livello N (senza addestramento), `?notte` 
 
 - La prima partita parte dall'addestramento (decollo, stabilizzatore, aggancio, atterraggio, verricello). Si può saltare in qualunque momento.
 - Anche il rotore di coda uccide (costa 150 punti). I superstiti su un tetto non lo attraversano: aspettano davanti alla coda, quindi conviene atterrare con la scaletta verso di loro.
-- Chi muore schizza sangue rosso (unica eccezione al bianco e nero): macchia tetti e pareti degli edifici e, se l'ha ucciso l'elicottero, resta sulla parte dell'elicottero che l'ha colpito (pale, coda, cabina, scaletta).
+- Chi muore schizza sangue rosso (unica eccezione al bianco e nero): macchia tetti e pareti degli edifici e, se l'ha ucciso l'elicottero, resta sulla parte dell'elicottero che l'ha colpito (pale, coda, cabina).
 - Chi è già appeso alla scaletta fa da "corda": il secondo recuperato si aggancia ai piedi del primo, non alla scaletta.
 - Chi è appeso e viene trascinato in acqua perde subito la presa, e con lui chi gli sta appeso sotto (dopo l'aggancio c'è un secondo per tirarlo fuori).
 - Verricello: la scaletta si allunga fino a 40 px. Si appoggia ai tetti senza attraversarli; più è lunga, più oscilla e più tempo serve per salire.
@@ -45,7 +45,7 @@ Parametri URL: `?livello=N` parte dal livello N (senza addestramento), `?notte` 
 - Persone diverse (dal livello 2): il bambino pesa metà, l'anziano corre a metà velocità, il cane non conta nel totale ma salvarlo vale 150 punti.
 - Nebbia dal livello 10 (quando non è notte): limpido solo vicino all'elicottero. Di notte stelle e luna restano visibili; con la luna piena si vede un po' di più.
 - Vibrazione sui telefoni e sui gamepad che la supportano (danni, esplosioni, agganci, strappi).
-- Aggancio con la scaletta solo sotto il 20% della velocità massima; sopra il 50% la scaletta travolge. Le pale uccidono sempre.
+- Aggancio con la scaletta solo sotto il 20% della velocità massima; più veloce la scaletta non aggancia, ma non fa male a nessuno. Le pale uccidono sempre.
 - La scaletta è di corda: oscilla con accelerazioni, frenate e vento, e l'elicottero si inclina in avanti quando accelera.
 - La spinta del rotore allontana chi è in acqua, con schizzi. È nulla proprio sotto la scaletta e massima a metà pala. Chi ha la scaletta sopra la testa ci nuota incontro.
 - I naufraghi si tengono lontani da muri, scogli e bordi: restano sempre raggiungibili.

@@ -296,6 +296,24 @@ test('verricello: la scaletta si allunga, si appoggia ai tetti, si riavvolge', (
   return 'lunghezza ' + winchConfig.min + '-' + winchConfig.max + ' px';
 });
 
+test('scaletta veloce: passa su un naufrago senza ucciderlo, avvisa solo di rallentare', () => {
+  const harness = boot(); const game = harness.play(harness.hook.levelSpec(1));
+  const config = harness.hook.CONFIG, heli = game.heli, fastSpeed = config.speed.crushLadder * 1.6;
+  const person = game.L.people.find(candidate => candidate.state === 'float'); person.timer = person.tmax = 99999;
+  heli.winch = heli.ladLen = config.winch.max;
+  let warned = false;
+  for (let i = 0; i < 90; i++) {
+    const startX = i === 0 ? person.x - 90 : heli.x;
+    place(harness, startX, person.y - 12 - config.winch.max + 6, fastSpeed, 0);
+    harness.tick();
+    if (game.msg && game.msg.startsWith('RALLENTA')) warned = true;
+  }
+  assert(person.state !== 'dead' && game.L.dead === 0 && game.L.killedByPlayer === 0, 'la scaletta veloce ha ucciso: ' + person.state);
+  assert(warned, 'la scaletta non ha mai toccato il naufrago: il test non prova niente');
+  assert(heli.state === 'fly', 'elicottero non in volo: ' + heli.state);
+  return 'velocita ' + fastSpeed.toFixed(2) + ' (soglia di aggancio ' + config.speed.hook.toFixed(2) + ')';
+});
+
 test('feriti: non si aggrappano alla scaletta, salgono solo atterrando (piano)', () => {
   const harness = boot(); const game = harness.play(harness.hook.levelSpec(3));
   const injuredPeople = game.L.people.filter(person => person.injured);
