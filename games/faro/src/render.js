@@ -203,4 +203,5 @@ function render() {
   if (game.L.fog) Lighting.fogBanks({ time: game.time, wind: game.wind, clear: [CONFIG.lamp.x, CONFIG.lamp.y, 40] });
   if (game.state !== 'title') drawHUD();
   drawOverlay();
+  Theme.finishFrame(false);
 }

@@ -250,6 +250,26 @@ test('Parallax: draw con pattern, bordo, dettagli e scorrimento; covers coerente
   assert(dom.fills.some(fill => fill.fillStyle === '#000' && fill.x === 2 && fill.y === 90 && fill.h === 20), 'scorrimento verticale o riempimento nero');
 });
 
+test('Theme: col tema scuro sempre notte; col tema chiaro di giorno inverte e ridipinge i colori; data-theme sulla pagina', () => {
+  const run = (light, isDayScene) => {
+    const dom = fakeDom();
+    const documentElement = { dataset: {} };
+    dom.document.documentElement = documentElement;
+    dom.window.matchMedia = query => ({ matches: light && query.includes('light') });
+    const { Theme } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js', 'engine/gfx/ui.js', 'engine/gfx/theme.js'], ['Theme'], { ...dom, CONFIG: { W: 384, H: 216 } });
+    let repainted = 0;
+    dom.fills.length = 0;
+    Theme.finishFrame(isDayScene, () => { repainted++; });
+    const inverted = dom.fills.some(fill => fill.x === 0 && fill.y === 0 && fill.w === 384 && fill.h === 216);
+    return { inverted, repainted, theme: documentElement.dataset.theme, isDay: Theme.isDay(isDayScene) };
+  };
+  assertEqual(run(false, true), { inverted: false, repainted: 0, theme: 'night', isDay: false }, 'tema scuro, scena di giorno');
+  assertEqual(run(true, false), { inverted: false, repainted: 0, theme: 'night', isDay: false }, 'tema chiaro, scena di notte');
+  assertEqual(run(true, true), { inverted: true, repainted: 1, theme: 'day', isDay: true }, 'tema chiaro, scena di giorno');
+  const { Theme } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js', 'engine/gfx/ui.js', 'engine/gfx/theme.js'], ['Theme'], { ...fakeDom(), CONFIG: { W: 384, H: 216 } });
+  assert(!Theme.isDay(true), 'senza matchMedia (harness) deve essere sempre notte');
+});
+
 test('Particles: i detriti si posano sul terreno del gioco (hook solidAt)', () => {
   const { Particles } = loadScripts(['engine/core/util.js', 'engine/world/particles.js'], ['Particles']);
   const chunk = { t: 'chunk', x: 10, y: 0, w: 2, h: 2, vx: 0.5, vy: 1, life: 400 };
@@ -290,6 +310,14 @@ function loadGfx() {
   const pixels = () => new Set(dom.fills.filter(fill => fill.w === 1 && fill.h === 1).map(fill => fill.x + ',' + fill.y));
   return { Gfx, dom, pixels };
 }
+
+test('Gfx: makePattern annerisce solo i punti delle righe', () => {
+  const dom = fakeDom();
+  const { Gfx } = loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js'], ['Gfx'], { ...dom, CONFIG: { W: 384, H: 216 } });
+  dom.fills.length = 0;
+  Gfx.makePattern(['#..', '.#.']);
+  assertEqual(dom.fills.map(fill => [fill.x, fill.y, fill.fillStyle]), [[1, 0, '#000'], [2, 0, '#000'], [0, 1, '#000'], [2, 1, '#000']]);
+});
 
 test('Gfx: drawLine piena e tratteggiata', () => {
   let setup = loadGfx();

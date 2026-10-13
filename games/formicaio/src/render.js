@@ -204,4 +204,5 @@ function render() {
   drawRain();
   if (game.state !== 'title') drawHUD();
   drawOverlay();
+  Theme.finishFrame(true);
 }

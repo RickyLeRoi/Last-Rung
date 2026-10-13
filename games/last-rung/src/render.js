@@ -30,12 +30,14 @@ function moonPixels(level) {
 
 function drawBackground() {
   const level = game.L, cameraX = game.camX, frame = game.frame, time = game.time;
-  for (const star of level.stars) {
+  // 20261013 ++ RG #day_theme: no stars and no moon in a daylight sky
+  const daylight = Theme.isDay(!level.night);
+  for (const star of daylight ? [] : level.stars) {
     const x = round(star.x - cameraX * 0.08);
     if (x < 0 || x >= SCREEN_WIDTH || (star.tw && ((frame + star.ph) % 120) < 10)) continue;
     canvasContext.fillRect(x, star.y, 1, 1);
   }
-  if (level.moon) {
+  if (level.moon && !daylight) {
     const moonX = round(level.moon.x - cameraX * 0.03), moonY = level.moon.y;
     for (const moonPixel of moonPixels(level)) canvasContext.fillRect(moonX + moonPixel[0], moonY + moonPixel[1], 1, 1);
   }
@@ -577,4 +579,9 @@ function render() {
   }
   if (game.state !== 'title') drawHUD();
   drawOverlay();
+  Theme.finishFrame(!game.L.night, () => {
+    canvasContext.setTransform(1, 0, 0, 1, -cameraX + shakeX, shakeY);
+    UI.red.flush();
+    canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+  });
 }

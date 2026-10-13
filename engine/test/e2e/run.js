@@ -30,8 +30,9 @@ if (unknown.length) { console.error('suite sconosciuta: ' + unknown.join(', ') +
 (async () => {
   const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
   const newContext = browser.newContext.bind(browser);
-  browser.newContext = async (...contextArguments) => {
-    const context = await newContext(...contextArguments);
+  // Dark device theme unless a suite asks otherwise: Playwright defaults to light, which turns day levels into black on white (Theme).
+  browser.newContext = async (options = {}) => {
+    const context = await newContext({ colorScheme: 'dark', ...options });
     await context.addInitScript(name => { Object.defineProperty(window, '__debug', { configurable: true, get: () => window[name] }); }, GAME.debugGlobal);
     return context;
   };

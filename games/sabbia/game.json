@@ -1,0 +1,12 @@
+{
+  "id": "sabbia",
+  "title": "Sabbia",
+  "shortName": "Sabbia",
+  "lang": "it",
+  "description": "Laboratorio di materiali che cadono, scorrono, bruciano ed evaporano, con le sfide: pixel art bianco su nero.",
+  "icon": {
+    "file": "src/sprites.js",
+    "sprite": "icon"
+  },
+  "debugGlobal": "__sabbia"
+}

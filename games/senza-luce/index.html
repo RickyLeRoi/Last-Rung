@@ -38,6 +38,12 @@
   #touch[data-state="title"] button.title { display: block; }
   #touch button.tut { display: none; }
   #touch[data-tut="1"] button.tut { display: block; }
+  /* by day (light device theme, day scene: engine Theme) the page around the canvas and the buttons swap too */
+  html[data-theme="day"], html[data-theme="day"] body, html[data-theme="day"] canvas { background: #fff; }
+  html[data-theme="day"] #touch button { background: #fff; color: #000; border-color: #000; }
+  html[data-theme="day"] #touch button.act, html[data-theme="day"] #touch button:active { background: #000; color: #fff; }
+  html[data-theme="day"] #stickBase { border-color: #000; }
+  html[data-theme="day"] #stickKnob { background: #000; }
 </style>
 </head>
 <body>
@@ -75,6 +81,7 @@
 <script src="../../engine/gfx/lighting.js"></script>
 <script src="../../engine/gfx/sky.js"></script>
 <script src="../../engine/gfx/ui.js"></script>
+<script src="../../engine/gfx/theme.js"></script>
 <script src="../../engine/core/steps.js"></script>
 <script src="src/state.js"></script>
 <script src="../../engine/audio/synth.js"></script>

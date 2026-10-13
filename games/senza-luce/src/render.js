@@ -280,4 +280,5 @@ function render() {
   toScreen();
   if (game.state !== 'title') drawHUD();
   drawOverlay();
+  Theme.finishFrame(false);
 }

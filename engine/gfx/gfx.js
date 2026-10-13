@@ -40,6 +40,17 @@ const Gfx = (() => {
   for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) if (!duskLitPixels.has(x + ',' + y)) duskContext.fillRect(x, y, 1, 1);
   const DUSK = canvasContext.createPattern(duskCanvas, 'repeat');
 
+  // 20261013 ++ RG #custom_patterns
+  // A fill pattern from rows of '#' (white shows through) and '.' (black), like the sprites: fill white, then the pattern.
+  function makePattern(rows) {
+    const patternCanvas = document.createElement('canvas');
+    patternCanvas.width = rows[0].length; patternCanvas.height = rows.length;
+    const patternContext = patternCanvas.getContext('2d');
+    patternContext.fillStyle = '#000';
+    rows.forEach((row, y) => [...row].forEach((cell, x) => { if (cell === '.') patternContext.fillRect(x, y, 1, 1); }));
+    return canvasContext.createPattern(patternCanvas, 'repeat');
+  }
+
   const RED = '#d00';   // blood: the only exception to black and white
   const pixel = (x, y) => canvasContext.fillRect(round(x), round(y), 1, 1);
 
@@ -137,5 +148,5 @@ const Gfx = (() => {
     for (let i = 0; i < sprite.p.length; i += 2) canvasContext.fillRect(x + sprite.p[i] * scale, y + sprite.p[i + 1] * scale, scale, scale);
   }
 
-  return { canvas, canvasContext, SCREEN_WIDTH, SCREEN_HEIGHT, DITHER, DARK, DUSK, RED, fit, pixel, horizontalLine, verticalLine, outlineRect, blackRect, drawLine, drawCircle, text, textBox, textWidth, drawPanel, drawSprite, drawSpriteScaled };
+  return { canvas, canvasContext, SCREEN_WIDTH, SCREEN_HEIGHT, DITHER, DARK, DUSK, RED, makePattern, fit, pixel, horizontalLine, verticalLine, outlineRect, blackRect, drawLine, drawCircle, text, textBox, textWidth, drawPanel, drawSprite, drawSpriteScaled };
 })();
