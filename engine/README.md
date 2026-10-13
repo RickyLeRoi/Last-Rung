@@ -12,7 +12,7 @@ Per creare un gioco seguire anche le [linee guida](../GUIDELINES.md) (aspetto, C
 
 ## Ordine di caricamento (`index.html`)
 
-`config` (del gioco) -> `core/util` -> `core/strings` -> `core/geometry` -> `core/replay` -> `core/loop` -> `gfx/sprite` -> sprite del gioco -> `gfx/gfx` -> `gfx/lighting` -> `gfx/ui` -> `core/steps` -> stato del gioco -> `audio/synth` -> effetti del gioco -> `input/input` -> bindings del gioco -> `world/*` e wrapper del gioco -> ... -> `core/flow` -> `main`.
+`config` (del gioco) -> `core/util` -> `core/strings` -> `core/geometry` -> `core/replay` -> `core/loop` -> `gfx/sprite` -> sprite del gioco -> `gfx/gfx` -> `gfx/lighting` -> `gfx/sky` -> `gfx/parallax` -> `gfx/ui` -> `core/steps` -> stato del gioco -> `audio/synth` -> effetti del gioco -> `input/input` -> bindings del gioco -> `world/*` e wrapper del gioco -> ... -> `core/flow` -> `main`.
 Le dipendenze sono solo "a valle": `Lighting`, `UI` e `Input` usano `Gfx`; `Steps` usa `UI`; `Flow` usa `Input`, `STRINGS`, `todayString`.
 
 ## Namespace
@@ -30,6 +30,7 @@ Le dipendenze sono solo "a valle": `Lighting`, `UI` e `Input` usano `Gfx`; `Step
 | `gfx/gfx.js` | `Gfx` | Canvas, adattamento allo schermo (`fit`), primitive, font bitmap, sprite (`drawSprite(sprite, x, y, flip, skew, skewFromRow = 4)`). |
 | `gfx/lighting.js` | `Lighting.darkness({ circles, cones, pattern })`, `Lighting.fog({ clear, lights, thin, dark, dither })`, `Lighting.fogBanks({ time, wind, clear })` | Buio e nebbia calcolati per colonna. Il gioco costruisce le sorgenti (anche i raggi tremolanti: `Math.random` resta nel gioco). Lasciano `fillStyle = '#fff'`. |
 | `gfx/sky.js` | `Sky.drawNight({ cameraX, covers, waterY, stars, moon, frame })` | Stelle e luna, disegnate solo dove la scena non le copre (`covers` = `[daX, aX, y, ...]`, piu' la superficie dell'acqua). |
+| `gfx/parallax.js` | `Parallax.draw(layers, cameraX, cameraY)`, `covers(layers, cameraX, cameraY)`, `ridge(random, shape)`, `blocks(rectangles, offsetX, length)` | Sfondi a strati che scorrono a una frazione della camera (`factor`, `factorY`), dal piu' lontano al piu' vicino. Uno strato e' un profilo di altezze per colonna (ripetuto, o fermo con `wrap: false`), riempito con un retino (bianco visto attraverso il pattern) o un colore pieno, con bordo `solid`/`dotted` e dettagli (luci) solo dentro la sagoma. Profondita' in 1 bit: lontano = contorno puntinato su nero, piu' vicino = retino piu' fitto. `covers` va passato a `Sky.drawNight` cosi' le stelle spariscono dietro le sagome. I generatori ricevono il `mulberry32` del gioco (mai il `Rng`): lo sfondo e' dato di render, la simulazione non lo legge. Commento in testa al file per i campi. |
 | `gfx/ui.js` | `UI.hint`, `UI.bar`, `UI.stars`, `UI.lines`, `UI.red.add/clear/flush`, `UI.invert` | Helper di HUD; i pixel rossi si dipingono per ultimi. |
 | `audio/synth.js` | `Synth.create({ volume, effects(api), loops })` | WebAudio generico. `effects({ tone, noise })` -> mappa nome/funzione; `loops.build({ context, master, noiseSource, filter, gain })` e `loops.update(nodes, levels, now)`. |
 | `input/input.js` | `Input.configure(bindings)`, `sample()`, `syncUI()`, `rumble()`, `device` | Tastiera, gamepad, levetta touch, pulsanti. Vedi sotto. |

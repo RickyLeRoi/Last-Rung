@@ -194,6 +194,44 @@ test('Terrain: draw disegna solo la finestra, con bordi bianchi e retino per mat
   assert(dom.fills.some(fill => fill.fillStyle === pattern) && dom.fills.some(fill => fill.fillStyle === '#fff' && fill.y === 30 && fill.w === 1), 'retino o bordo mancanti');
 });
 
+const parallax = dom => loadScripts(['engine/core/util.js', 'engine/core/geometry.js', 'engine/gfx/gfx.js', 'engine/gfx/parallax.js'], ['Parallax', 'mulberry32'], { ...dom, CONFIG: { W: 384, H: 216 } });
+
+test('Parallax: ridge periodico, nei limiti e uguale a parita di seed; blocks prende il tetto piu alto', () => {
+  const { Parallax, mulberry32 } = parallax(fakeDom());
+  const options = { period: 192, step: 48, baseY: 150, lowest: 10, amplitude: 40, roughness: 0.3 };
+  const first = Parallax.ridge(mulberry32(7), options), second = Parallax.ridge(mulberry32(7), options);
+  assertEqual([...first], [...second], 'stesso seed');
+  assert(first.every(top => top >= 100 && top <= 140), 'tetti fuori dai limiti');
+  assert(Math.abs(first[191] - first[0]) <= 3, 'il profilo non si richiude sul periodo');
+  const profile = Parallax.blocks([{ x: 10, y: 50, w: 4 }, { x: 12, y: 40, w: 4 }], 8, 10);
+  assertEqual([...profile].map(top => top === 32767 ? null : top), [null, null, 50, 50, 40, 40, 40, 40, null, null]);
+});
+
+test('Parallax: draw con pattern, bordo, dettagli e scorrimento; covers coerente con il profilo', () => {
+  const dom = fakeDom();
+  const { Parallax } = parallax(dom);
+  const pattern = { pattern: true };
+  const profile = new Int16Array(8).fill(32767);
+  profile[2] = 100; profile[3] = 100; profile[4] = 90;
+  const layer = { factor: 0.5, baseY: 120, profile, fill: pattern, edge: 'solid', details: [3, 110, 3, 95] };
+  dom.fills.length = 0;
+  Parallax.draw([layer], 0, 0);
+  assert(dom.fills.every(fill => Number.isInteger(fill.x) && Number.isInteger(fill.y) && Number.isInteger(fill.w) && Number.isInteger(fill.h)), 'coordinate non intere');
+  assert(dom.fills.some(fill => fill.fillStyle === pattern && fill.x === 2 && fill.y === 100 && fill.w === 2 && fill.h === 20), 'riempimento a retino mancante');
+  assert(dom.fills.some(fill => fill.fillStyle === '#fff' && fill.x === 10 && fill.y === 100 && fill.h === 20), 'il profilo non si ripete');
+  assert(dom.fills.some(fill => fill.fillStyle === '#fff' && fill.x === 3 && fill.y === 110 && fill.w === 1), 'dettaglio dentro la sagoma mancante');
+  assert(!dom.fills.some(fill => fill.x === 3 && fill.y === 95), 'dettaglio sopra la sagoma disegnato');
+  assert(dom.fills.some(fill => fill.x === 2 && fill.y <= 119 && fill.y + fill.h > 119 && fill.w === 1) && dom.fills.some(fill => fill.x === 4 && fill.y <= 119 && fill.y + fill.h > 119 && fill.w === 1), 'lati verticali mancanti');
+  dom.fills.length = 0;
+  Parallax.draw([layer], 4, 0);
+  assert(dom.fills.some(fill => fill.fillStyle === pattern && fill.x === 0 && fill.y === 100 && fill.w === 2), 'con camera 4 e fattore 0,5 lo strato scorre di 2');
+  const covers = Parallax.covers([{ ...layer, factor: 0 }], 123, 0);
+  assertEqual(covers.slice(0, 6), [2, 4, 99, 4, 5, 89], 'coperture');
+  dom.fills.length = 0;
+  Parallax.draw([{ ...layer, factor: 0, factorY: 0.5, fill: '#000' }], 0, 20);
+  assert(dom.fills.some(fill => fill.fillStyle === '#000' && fill.x === 2 && fill.y === 90 && fill.h === 20), 'scorrimento verticale o riempimento nero');
+});
+
 test('Particles: i detriti si posano sul terreno del gioco (hook solidAt)', () => {
   const { Particles } = loadScripts(['engine/core/util.js', 'engine/world/particles.js'], ['Particles']);
   const chunk = { t: 'chunk', x: 10, y: 0, w: 2, h: 2, vx: 0.5, vy: 1, life: 400 };

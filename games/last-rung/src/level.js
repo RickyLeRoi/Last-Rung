@@ -131,6 +131,7 @@ function genLevel(spec) {
 
   function buildSea(storm) {
     const base = storm ? 140 : 150, amplitude = 1 + loop * 0.12;
+    level.horizon = base;
     level.water = storm
       ? makeWater(base, [6.2 * amplitude, 3 * amplitude, 1.4], [1.3, 1.9, 3.1], null, level.worldW)
       : makeWater(base, [3 * amplitude, 1.6, 0.8], [1.0, 1.6, 2.7], null, level.worldW);
@@ -181,6 +182,7 @@ function genLevel(spec) {
 
   function buildFlood() {
     const base = 168;
+    level.horizon = base;
     level.water = makeWater(base, [1.4, 0.8, 0.4], [0.8, 1.3, 2.1], null, level.worldW);
     level.rain = 0.35;
     const buildings = [];
@@ -241,6 +243,7 @@ function genLevel(spec) {
 
   function buildFire() {
     const groundY = 190;
+    level.horizon = groundY;
     level.water = makeWater(195, [1, 0.6, 0.3], [0.9, 1.5, 2.3], [[480, 620]], level.worldW, [0.05, 0.09, 0.15]);
     level.solids.push({ kind: 'ground', x: 0, y: groundY, w: 480, h: 40 }, { kind: 'ground', x: 620, y: groundY, w: level.worldW - 620, h: 40 });
     const buildings = [];
@@ -285,6 +288,7 @@ function genLevel(spec) {
 
   function buildTutorial() {
     const base = 168;
+    level.horizon = base;
     level.worldW = 480;
     level.sc = { id: 'flood', name: 'ADDESTRAMENTO', hint: '' };
     level.water = makeWater(base, [1, 0.6, 0.3], [0.8, 1.3, 2.1], null, level.worldW);
@@ -352,5 +356,6 @@ function genLevel(spec) {
   if (level.night) level.moonFull = random() < 0.5;
 
   level.total = level.people.filter(person => person.kind !== 'dog').length;
+  level.backdrop = makeBackdrop(level);
   return level;
 }

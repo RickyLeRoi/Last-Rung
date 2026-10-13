@@ -50,6 +50,21 @@ const CONFIG = (() => {
     panic: { run: 0.9, hesitate: 70, reach: 20, reachUp: 14, reachDown: 36, jumpVx: 0.9, jumpVy: 1.1 },
     night: { cone: 0.36, coneLen: 140, halo: 22, safe: 30, fire: 22 },
     fog: { from: 10, clear: 60, thin: 96, fire: 16 },   // fog from level 10: clear radius and radius beyond which almost nothing is visible
+    // parallax ridges (px): tops between horizon - lowest - amplitude and horizon - lowest; period is a multiple of step
+    backdrop: {
+      seaMountains: { period: 768, step: 64, lowest: 14, amplitude: 36, roughness: 0.25 },
+      seaCoast: { period: 576, step: 48, lowest: 6, amplitude: 14, roughness: 0.35 },
+      villages: 3,
+      stormCoast: { period: 768, step: 64, lowest: 2, amplitude: 18, roughness: 0.3 },
+      city: {
+        mountains: { period: 768, step: 96, lowest: 46, amplitude: 44, roughness: 0.2 },
+        hills: { period: 576, step: 48, lowest: 18, amplitude: 28, roughness: 0.3 },
+      },
+      fire: {
+        mountains: { period: 768, step: 96, lowest: 56, amplitude: 50, roughness: 0.2 },
+        hills: { period: 576, step: 48, lowest: 24, amplitude: 30, roughness: 0.3 },
+      },
+    },
     // turning: flips when already flying in the new direction, or when held (immediately on the ground)
     turn: { moving: 0.15, hold: 36 },
     // ladder snagged on cables and pylons: pull force, frames until it tears free

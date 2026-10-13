@@ -44,13 +44,7 @@ function drawBackground() {
     const x = round((((cloud.x - cameraX * cloud.par + time * cloud.sp) % span) + span) % span - 120);
     for (let i = 0; i < cloud.pts.length; i += 2) canvasContext.fillRect(x + cloud.pts[i], cloud.y + cloud.pts[i + 1], 1, 1);
   }
-  for (const building of level.skyline) {
-    const x = round(building.x - cameraX * 0.35);
-    if (x + building.w < 0 || x > SCREEN_WIDTH) continue;
-    for (let edgeY = building.y; edgeY < building.bot; edgeY += 2) { canvasContext.fillRect(x, edgeY, 1, 1); canvasContext.fillRect(x + building.w, edgeY, 1, 1); }
-    for (let edgeX = x; edgeX <= x + building.w; edgeX += 2) canvasContext.fillRect(edgeX, building.y, 1, 1);
-    for (let i = 0; i < building.lights.length; i += 2) canvasContext.fillRect(x + building.lights[i], building.y + building.lights[i + 1], 1, 1);
-  }
+  Parallax.draw(level.backdrop, cameraX, 0);
 }
 
 function drawSolid(solid, cameraX) {
@@ -374,7 +368,7 @@ function drawNightSky(cameraX) {
   const level = game.L, heli = game.heli, covers = [];
   for (const solid of level.solids) covers.push(solid.x - cameraX - 1, solid.x + solid.w - cameraX + 1, solid.y - 1);
   for (const hazard of level.haz) covers.push(hazard.x0 - cameraX - 1, hazard.x1 - cameraX + 2, hazard.y0 - 2);
-  for (const building of level.skyline) { const x = round(building.x - cameraX * 0.35); covers.push(x - 1, x + building.w + 2, building.y - 1); }
+  covers.push(...Parallax.covers(level.backdrop, cameraX, 0));
   for (const fire of level.fires) covers.push(fire.x - cameraX - 4, fire.x + fire.w - cameraX + 4, fire.y - fire.h - 6);
   if (heli.state !== 'dead') covers.push(heli.x - cameraX - 2, heli.x + 34 - cameraX, heli.y - 2);
   const moon = level.moon ? { x: level.moon.x, y: level.moon.y, pixels: moonPixels(level) } : null;
